@@ -98,7 +98,12 @@ export default async function RapportsPage() {
                 {reports.map((report) => (
                   <TableRow key={report.id}>
                     <TableCell className="font-medium">
-                      {report.firstName} {report.lastName}
+                      <Link
+                        href={`/rapports/${report.id}`}
+                        className="transition-colors hover:text-foreground/70"
+                      >
+                        {report.firstName} {report.lastName}
+                      </Link>
                     </TableCell>
                     <TableCell>
                       {operationTypeLabels[report.operationType]}
