@@ -20,18 +20,12 @@ datasource db {
 enum Role {
   ADMIN
   DOCTOR
-  NURSE
 }
 
 enum OperationType {
   NATURAL_DELIVERY
   EMERGENCY_C_SECTION
   SCHEDULED_C_SECTION
-}
-
-enum ReportStatus {
-  DRAFT
-  FINAL
 }
 
 enum BloodType {
@@ -71,7 +65,6 @@ model Patient {
   nationality   String
   bloodType     BloodType
   birthPlace    String?
-  address       String?
   medicalHistory String?
   reports       LabourReport[]
 
@@ -92,11 +85,8 @@ model LabourReport {
   operatorFullName         String
   anesthesiologistFullName String
   complications            String?
-  babyWeightGrams          Int?
-  babyGender               String?
   fullDescription          String        @db.Text
   postOpNotes              String?
-  status                   ReportStatus  @default(DRAFT)
 
   patient Patient @relation(fields: [patientId], references: [id])
   doctor  User    @relation(fields: [doctorId], references: [id])

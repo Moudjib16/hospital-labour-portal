@@ -57,7 +57,6 @@ async function main() {
       nationality: "Algérienne",
       bloodType: "O_POS" as const,
       birthPlace: "Mila",
-      address: "Cité des Frères Benal, Mila",
       medicalHistory: "Aucun antécédent notable.",
     },
     {
@@ -69,7 +68,6 @@ async function main() {
       nationality: "Algérienne",
       bloodType: "A_NEG" as const,
       birthPlace: "Tadjenanet",
-      address: "Rue du 1er Novembre, Tadjenanet, Mila",
       medicalHistory: "Asthmatique, hypertension légère.",
     },
     {
@@ -81,7 +79,6 @@ async function main() {
       nationality: "Algérienne",
       bloodType: "AB_POS" as const,
       birthPlace: "Guerouaou",
-      address: "Cité El Badr, Guerouaou, Mila",
       medicalHistory: "Antécédent de césarienne.",
     },
   ];
@@ -113,8 +110,6 @@ async function main() {
       operatorFullName: "Dr. Brahim Kacem",
       anesthesiologistFullName: "Dr. Salim Benhamou",
       complications: "Aucune",
-      babyWeightGrams: 3350,
-      babyGender: "Féminin",
       fullDescription:
         "Patiente âgée de 31 ans, primigeste, admise en salle de travail à terme sur grossesse spontanée. " +
         "Travail spontané d'une durée totale de 8 heures, dilatation complète atteinte progressivement. " +
@@ -124,7 +119,6 @@ async function main() {
         "Révision utérine non nécessaire. Périmètre placentaire intact. " +
         "Suites immédiates simples, retour de la patiente en salle d'hospitalisation sans incident.",
       postOpNotes: "Suites simples, sortie à J+2.",
-      status: "FINAL",
     },
   });
   console.log("✔ Sample labour report created");
