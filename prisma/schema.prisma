@@ -1,0 +1,96 @@
+// Prisma schema for the Hospital Labour Portal
+// Generates the client into src/generated/prisma (see output below)
+
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  // Required for tsx/Turbopack compatibility: generated imports use ".ts"
+  // instead of ".js" so the TypeScript runner can resolve them.
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  DOCTOR
+  NURSE
+}
+
+enum DeliveryType {
+  NATURAL
+  C_SECTION
+}
+
+enum ReportStatus {
+  DRAFT
+  FINAL
+}
+
+enum BloodType {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+// ─────────────────────────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────────────────────────
+
+model User {
+  id           String        @id @default(cuid())
+  username     String        @unique
+  name         String
+  passwordHash String
+  role         Role          @default(DOCTOR)
+  reports      LabourReport[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Patient {
+  id            String         @id @default(cuid())
+  nationalId    String         @unique
+  firstName     String
+  lastName      String
+  dateOfBirth   DateTime
+  bloodType     BloodType
+  birthPlace    String?
+  address       String?
+  medicalHistory String?
+  reports       LabourReport[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LabourReport {
+  id             String       @id @default(cuid())
+  patientId      String
+  doctorId       String
+  deliveryType   DeliveryType
+  deliveryDate   DateTime     @default(now())
+  complications  String?
+  babyWeightGrams Int?
+  babyGender     String?
+  postOpNotes    String?
+  status         ReportStatus @default(DRAFT)
+
+  patient Patient  @relation(fields: [patientId], references: [id])
+  doctor  User     @relation(fields: [doctorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
