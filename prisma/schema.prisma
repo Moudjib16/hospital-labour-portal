@@ -23,9 +23,10 @@ enum Role {
   NURSE
 }
 
-enum DeliveryType {
-  NATURAL
-  C_SECTION
+enum OperationType {
+  NATURAL_DELIVERY
+  EMERGENCY_C_SECTION
+  SCHEDULED_C_SECTION
 }
 
 enum ReportStatus {
@@ -65,7 +66,9 @@ model Patient {
   nationalId    String         @unique
   firstName     String
   lastName      String
+  age           Int
   dateOfBirth   DateTime
+  nationality   String
   bloodType     BloodType
   birthPlace    String?
   address       String?
@@ -77,19 +80,26 @@ model Patient {
 }
 
 model LabourReport {
-  id             String       @id @default(cuid())
-  patientId      String
-  doctorId       String
-  deliveryType   DeliveryType
-  deliveryDate   DateTime     @default(now())
-  complications  String?
-  babyWeightGrams Int?
-  babyGender     String?
-  postOpNotes    String?
-  status         ReportStatus @default(DRAFT)
+  id                       String        @id @default(cuid())
+  patientId                String
+  doctorId                 String
+  firstName                String
+  lastName                 String
+  age                      Int
+  nationality              String
+  operationType            OperationType
+  deliveryDate             DateTime      @default(now())
+  operatorFullName         String
+  anesthesiologistFullName String
+  complications            String?
+  babyWeightGrams          Int?
+  babyGender               String?
+  fullDescription          String        @db.Text
+  postOpNotes              String?
+  status                   ReportStatus  @default(DRAFT)
 
-  patient Patient  @relation(fields: [patientId], references: [id])
-  doctor  User     @relation(fields: [doctorId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  User    @relation(fields: [doctorId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

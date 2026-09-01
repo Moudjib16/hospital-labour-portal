@@ -52,7 +52,9 @@ async function main() {
       nationalId: "112233445566",
       firstName: "Amina",
       lastName: "Bouzid",
+      age: 31,
       dateOfBirth: new Date("1995-03-14"),
+      nationality: "Algérienne",
       bloodType: "O_POS" as const,
       birthPlace: "Mila",
       address: "Cité des Frères Benal, Mila",
@@ -62,7 +64,9 @@ async function main() {
       nationalId: "223344556677",
       firstName: "Yacine",
       lastName: "Merabet",
+      age: 36,
       dateOfBirth: new Date("1990-07-22"),
+      nationality: "Algérienne",
       bloodType: "A_NEG" as const,
       birthPlace: "Tadjenanet",
       address: "Rue du 1er Novembre, Tadjenanet, Mila",
@@ -72,7 +76,9 @@ async function main() {
       nationalId: "334455667788",
       firstName: "Sofia",
       lastName: "Hamidi",
+      age: 27,
       dateOfBirth: new Date("1998-11-02"),
+      nationality: "Algérienne",
       bloodType: "AB_POS" as const,
       birthPlace: "Guerouaou",
       address: "Cité El Badr, Guerouaou, Mila",
@@ -98,11 +104,25 @@ async function main() {
     data: {
       patientId: amina.id,
       doctorId: doctor1.id,
-      deliveryType: "NATURAL",
+      firstName: amina.firstName,
+      lastName: amina.lastName,
+      age: amina.age,
+      nationality: amina.nationality,
+      operationType: "NATURAL_DELIVERY",
       deliveryDate: new Date("2026-08-15"),
+      operatorFullName: "Dr. Brahim Kacem",
+      anesthesiologistFullName: "Dr. Salim Benhamou",
       complications: "Aucune",
       babyWeightGrams: 3350,
       babyGender: "Féminin",
+      fullDescription:
+        "Patiente âgée de 31 ans, primigeste, admise en salle de travail à terme sur grossesse spontanée. " +
+        "Travail spontané d'une durée totale de 8 heures, dilatation complète atteinte progressivement. " +
+        "Expulsion dirigée en position dorsale, sous analgésie péridurale. " +
+        "Naissance d'un nouveau-né de sexe féminin en bonne adaptation à la vie extra-utérine, Score d'Apgar 9/10. " +
+        "Délivrance naturelle complète, globe utérin correct, saignement minime. " +
+        "Révision utérine non nécessaire. Périmètre placentaire intact. " +
+        "Suites immédiates simples, retour de la patiente en salle d'hospitalisation sans incident.",
       postOpNotes: "Suites simples, sortie à J+2.",
       status: "FINAL",
     },
