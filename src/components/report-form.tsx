@@ -24,18 +24,10 @@ import {
 } from "@/components/ui/card";
 import { createReport } from "@/actions/reports";
 import { BloodType, OperationType } from "@/generated/prisma/enums";
-import { operationTypeLabels } from "@/lib/report-labels";
-
-const bloodTypeLabels: Record<BloodType, string> = {
-  A_POS: "A+",
-  A_NEG: "A-",
-  B_POS: "B+",
-  B_NEG: "B-",
-  AB_POS: "AB+",
-  AB_NEG: "AB-",
-  O_POS: "O+",
-  O_NEG: "O-",
-};
+import {
+  bloodTypeLabels,
+  operationTypeLabels,
+} from "@/lib/report-labels";
 
 type ReportFormProps = {
   operatorName: string;

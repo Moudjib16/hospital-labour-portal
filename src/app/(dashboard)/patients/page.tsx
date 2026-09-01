@@ -1,3 +1,6 @@
+import type { Metadata } from "next";
+
+import { db } from "@/lib/db";
 import {
   Card,
   CardContent,
@@ -5,28 +8,45 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { PatientTable } from "@/components/patient-table";
 
-export default function PatientsPage() {
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Patients",
+};
+
+export default async function PatientsPage() {
+  const patients = await db.patient.findMany({
+    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
+    include: { _count: { select: { reports: true } } },
+  });
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Patients</h1>
-          <p className="text-sm text-muted-foreground">
-            Gestion des dossiers patients de la maternité.
-          </p>
-        </div>
+      <header>
+        <h1 className="text-2xl font-bold tracking-tight">Patients</h1>
+        <p className="text-sm text-muted-foreground">
+          Gestion des dossiers patients de la maternité.
+        </p>
       </header>
 
       <Card>
         <CardHeader>
           <CardTitle>Liste des patients</CardTitle>
           <CardDescription>
-            Recherchez ou enregistrez de nouveaux patients.
+            {patients.length} patient{patients.length > 1 ? "s" : ""}{" "}
+            enregistré{patients.length > 1 ? "s" : ""}.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          Aucun patient enregistré pour le moment.
+        <CardContent>
+          {patients.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Aucun patient enregistré pour le moment.
+            </p>
+          ) : (
+            <PatientTable patients={patients} />
+          )}
         </CardContent>
       </Card>
     </div>
