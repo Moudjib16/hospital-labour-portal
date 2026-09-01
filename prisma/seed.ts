@@ -49,33 +49,27 @@ async function main() {
   // Patients (Mila province, Algeria — French/Algerian names)
   const patients = [
     {
-      nationalId: "112233445566",
       firstName: "Amina",
       lastName: "Bouzid",
       age: 31,
-      dateOfBirth: new Date("1995-03-14"),
       nationality: "Algérienne",
       bloodType: "O_POS" as const,
       birthPlace: "Mila",
       medicalHistory: "Aucun antécédent notable.",
     },
     {
-      nationalId: "223344556677",
       firstName: "Yacine",
       lastName: "Merabet",
       age: 36,
-      dateOfBirth: new Date("1990-07-22"),
       nationality: "Algérienne",
       bloodType: "A_NEG" as const,
       birthPlace: "Tadjenanet",
       medicalHistory: "Asthmatique, hypertension légère.",
     },
     {
-      nationalId: "334455667788",
       firstName: "Sofia",
       lastName: "Hamidi",
       age: 27,
-      dateOfBirth: new Date("1998-11-02"),
       nationality: "Algérienne",
       bloodType: "AB_POS" as const,
       birthPlace: "Guerouaou",
@@ -84,17 +78,29 @@ async function main() {
   ];
 
   for (const p of patients) {
-    await prisma.patient.upsert({
-      where: { nationalId: p.nationalId },
-      update: {},
-      create: p,
+    const existing = await prisma.patient.findFirst({
+      where: {
+        firstName: p.firstName,
+        lastName: p.lastName,
+      },
     });
+
+    if (existing) {
+      await prisma.patient.update({
+        where: { id: existing.id },
+        data: p,
+      });
+    } else {
+      await prisma.patient.create({
+        data: p,
+      });
+    }
+    console.log(`✔ Patient ready: ${p.firstName} ${p.lastName}`);
   }
 
-  const amina = await prisma.patient.findUniqueOrThrow({
-    where: { nationalId: "112233445566" },
+  const amina = await prisma.patient.findFirstOrThrow({
+    where: { firstName: "Amina", lastName: "Bouzid" },
   });
-  console.log(`✔ Patients created (first: ${amina.firstName} ${amina.lastName})`);
 
   // Sample finalized labour report linking a patient to a doctor
   await prisma.labourReport.create({
@@ -105,6 +111,7 @@ async function main() {
       lastName: amina.lastName,
       age: amina.age,
       nationality: amina.nationality,
+      bloodType: amina.bloodType,
       operationType: "NATURAL_DELIVERY",
       deliveryDate: new Date("2026-08-15"),
       operatorFullName: "Dr. Brahim Kacem",

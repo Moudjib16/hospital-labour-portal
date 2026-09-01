@@ -57,11 +57,9 @@ model User {
 
 model Patient {
   id            String         @id @default(cuid())
-  nationalId    String         @unique
   firstName     String
   lastName      String
   age           Int
-  dateOfBirth   DateTime
   nationality   String
   bloodType     BloodType
   birthPlace    String?
@@ -80,6 +78,7 @@ model LabourReport {
   lastName                 String
   age                      Int
   nationality              String
+  bloodType                BloodType
   operationType            OperationType
   deliveryDate             DateTime      @default(now())
   operatorFullName         String

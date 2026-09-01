@@ -13,21 +13,12 @@ export const metadata: Metadata = {
 export default async function NouveauRapportPage() {
   const session = await auth();
 
-  const patientsPromise = db.patient.findMany({
-    orderBy: [{ lastName: "asc" }, { firstName: "asc" }],
-    select: { id: true, firstName: true, lastName: true, nationalId: true },
-  });
-  const doctorPromise = session?.user?.id
-    ? db.user.findUnique({
+  const doctor = session?.user?.id
+    ? await db.user.findUnique({
         where: { id: session.user.id },
         select: { name: true },
       })
-    : Promise.resolve(null);
-
-  const [patients, doctor] = await Promise.all([
-    patientsPromise,
-    doctorPromise,
-  ]);
+    : null;
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -47,7 +38,7 @@ export default async function NouveauRapportPage() {
         </p>
       </header>
 
-      <ReportForm patients={patients} operatorName={doctor?.name ?? ""} />
+      <ReportForm operatorName={doctor?.name ?? ""} />
     </div>
   );
 }

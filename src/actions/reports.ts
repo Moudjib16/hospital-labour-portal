@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { OperationType } from "@/generated/prisma/enums";
+import { BloodType, OperationType } from "@/generated/prisma/enums";
 
 export type CreateReportState = {
   error?: string;
@@ -20,6 +20,18 @@ function isOperationType(value: string): value is OperationType {
   return (Object.values(OperationType) as string[]).includes(value);
 }
 
+function isBloodType(value: string): value is BloodType {
+  return (Object.values(BloodType) as string[]).includes(value);
+}
+
+function parsePositiveInt(value: string): number | null {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < 0) {
+    return null;
+  }
+  return n;
+}
+
 export async function createReport(
   _prevState: CreateReportState,
   formData: FormData
@@ -30,7 +42,15 @@ export async function createReport(
     return { error: "Votre session a expiré, veuillez vous reconnecter." };
   }
 
-  const patientId = getString(formData, "patientId");
+  const doctor = await db.user.findUnique({ where: { id: doctorId } });
+  if (!doctor) {
+    return { error: "Compte introuvable." };
+  }
+
+  const firstName = getString(formData, "firstName");
+  const lastName = getString(formData, "lastName");
+  const nationality = getString(formData, "nationality");
+  const bloodType = getString(formData, "bloodType");
   const operationType = getString(formData, "operationType");
   const anesthesiologistFullName = getString(
     formData,
@@ -38,8 +58,14 @@ export async function createReport(
   );
   const fullDescription = getString(formData, "fullDescription");
 
-  if (!patientId) {
-    return { error: "Veuillez sélectionner un patient." };
+  if (!firstName || !lastName) {
+    return { error: "Veuillez renseigner le nom du patient." };
+  }
+  if (!nationality) {
+    return { error: "Veuillez renseigner la nationalité." };
+  }
+  if (!isBloodType(bloodType)) {
+    return { error: "Groupe sanguin invalide." };
   }
   if (!isOperationType(operationType)) {
     return { error: "Type d'opération invalide." };
@@ -49,37 +75,59 @@ export async function createReport(
   }
   if (!fullDescription) {
     return {
-      error:
-        "Veuillez renseigner la description complète de l'intervention.",
+      error: "Veuillez renseigner la description complète de l'intervention.",
     };
   }
 
-  const [doctor, patient] = await Promise.all([
-    db.user.findUnique({ where: { id: doctorId } }),
-    db.patient.findUnique({ where: { id: patientId } }),
-  ]);
-
-  if (!doctor) {
-    return { error: "Compte introuvable." };
-  }
-  if (!patient) {
-    return { error: "Le patient sélectionné est introuvable." };
+  const age = parsePositiveInt(getString(formData, "age"));
+  if (age === null) {
+    return { error: "L'âge doit être un nombre entier positif." };
   }
 
   const deliveryDateInput = getString(formData, "deliveryDate");
-  const deliveryDate = deliveryDateInput ? new Date(deliveryDateInput) : undefined;
+  const deliveryDate = deliveryDateInput
+    ? new Date(deliveryDateInput)
+    : undefined;
   if (deliveryDate && Number.isNaN(deliveryDate.getTime())) {
     return { error: "La date d'accouchement est invalide." };
   }
+
+  const birthPlace = getString(formData, "birthPlace") || null;
+  const medicalHistory = getString(formData, "medicalHistory") || null;
+
+  const existing = await db.patient.findFirst({
+    where: {
+      firstName,
+      lastName,
+      age,
+      nationality,
+      bloodType,
+    },
+  });
+
+  const patient = await db.patient.upsert({
+    where: { id: existing?.id ?? "" },
+    update: {},
+    create: {
+      firstName,
+      lastName,
+      age,
+      nationality,
+      bloodType,
+      birthPlace,
+      medicalHistory,
+    },
+  });
 
   await db.labourReport.create({
     data: {
       patientId: patient.id,
       doctorId: doctor.id,
-      firstName: patient.firstName,
-      lastName: patient.lastName,
-      age: patient.age,
-      nationality: patient.nationality,
+      firstName,
+      lastName,
+      age,
+      nationality,
+      bloodType,
       operationType,
       deliveryDate,
       operatorFullName: doctor.name,
