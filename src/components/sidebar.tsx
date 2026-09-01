@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Activity, LogOut } from "lucide-react";
 
+import { logout } from "@/actions/auth";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -78,12 +79,14 @@ function NavItem({ link, active }: NavItemProps) {
 
 function SidebarFooter() {
   return (
-    <Link
-      href="/"
-      className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
-    >
-      <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
-      <span>Déconnexion</span>
-    </Link>
+    <form action={logout}>
+      <button
+        type="submit"
+        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800 hover:text-white"
+      >
+        <LogOut className="h-5 w-5 shrink-0" aria-hidden="true" />
+        <span>Déconnexion</span>
+      </button>
+    </form>
   );
 }
