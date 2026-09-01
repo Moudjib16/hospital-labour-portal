@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+
+import { auth } from "@/auth";
 import {
   Card,
   CardContent,
@@ -6,7 +9,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-export default function ParametresPage() {
+export default async function ParametresPage() {
+  const session = await auth();
+
+  if (session?.user?.role !== "ADMIN") {
+    redirect("/tableau-de-bord");
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
       <header>
