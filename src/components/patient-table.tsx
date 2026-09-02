@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -86,7 +87,12 @@ export function PatientTable({ patients }: PatientTableProps) {
             {filtered.map((patient) => (
               <TableRow key={patient.id}>
                 <TableCell className="font-medium">
-                  {patient.firstName} {patient.lastName}
+                  <Link
+                    href={`/patients/${patient.id}`}
+                    className="transition-colors hover:text-foreground/70"
+                  >
+                    {patient.firstName} {patient.lastName}
+                  </Link>
                 </TableCell>
                 <TableCell>{patient.age}</TableCell>
                 <TableCell>{patient.nationality}</TableCell>
