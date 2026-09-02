@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PatientTable } from "@/components/patient-table";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -24,12 +25,10 @@ export default async function PatientsPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <header>
-        <h1 className="text-2xl font-bold tracking-tight">Patients</h1>
-        <p className="text-sm text-muted-foreground">
-          Gestion des dossiers patients de la maternité.
-        </p>
-      </header>
+      <PageHeader
+        title="Patients"
+        description="Gestion des dossiers patients de la maternité."
+      />
 
       <Card>
         <CardHeader>

@@ -23,6 +23,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -62,17 +63,16 @@ export default async function PatientDetailPage({
       <header className="flex flex-col gap-2">
         <Link
           href="/patients"
-          className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Retour aux patients
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {patient.firstName} {patient.lastName}
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Dossier médical du patient de la maternité.
-        </p>
+        <PageHeader
+          title={`${patient.firstName} ${patient.lastName}`}
+          description="Dossier médical du patient de la maternité."
+          className="!gap-y-1"
+        />
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
@@ -162,9 +162,11 @@ export default async function PatientDetailPage({
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-4">
-      <dt className="shrink-0 text-muted-foreground">{label}</dt>
-      <dd className="text-right font-medium">{value}</dd>
+    <div className="flex items-start justify-between gap-3 border-b border-dashed border-border/60 pb-1.5">
+      <dt className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </dt>
+      <dd className="text-right font-medium text-foreground">{value}</dd>
     </div>
   );
 }

@@ -126,13 +126,11 @@ export function ReportForm({ operatorName }: ReportFormProps) {
                 disabled
                 readOnly
               />
-              <p className="text-xs text-muted-foreground">
-                Renseigné automatiquement avec votre nom.
-              </p>
             </div>
 
-            <fieldset className="space-y-4">
-              <legend className="text-sm font-medium text-muted-foreground">
+            <fieldset className="space-y-4 border-t border-border pt-4">
+              <legend className="flex items-center gap-2 px-0 text-xs font-semibold uppercase tracking-wider text-primary">
+                <span className="inline-block h-2 w-2 rounded-full bg-primary" />
                 Informations du patient
               </legend>
               <div className="grid gap-5 sm:grid-cols-2">
@@ -231,8 +229,9 @@ export function ReportForm({ operatorName }: ReportFormProps) {
               </div>
             </fieldset>
 
-            <fieldset className="space-y-4">
-              <legend className="text-sm font-medium text-muted-foreground">
+            <fieldset className="space-y-4 border-t border-border pt-4">
+              <legend className="flex items-center gap-2 px-0 text-xs font-semibold uppercase tracking-wider text-primary">
+                <span className="inline-block h-2 w-2 rounded-full bg-primary" />
                 Informations de l&apos;intervention
               </legend>
               <div className="grid gap-5 sm:grid-cols-2">

@@ -28,7 +28,7 @@ export function LoginForm({ action, callbackUrl }: LoginFormProps) {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <Activity className="mx-auto h-10 w-10 text-cyan-600" aria-hidden="true" />
+        <Activity className="mx-auto h-10 w-10 text-primary" aria-hidden="true" />
         <CardTitle className="text-xl">Connexion</CardTitle>
         <CardDescription>
           Portail Hospitalier — Rapports Médicaux

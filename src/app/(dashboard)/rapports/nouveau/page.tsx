@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { ReportForm } from "@/components/report-form";
+import { PageHeader } from "@/components/page-header";
 
 export const metadata: Metadata = {
   title: "Nouveau rapport",
@@ -25,17 +26,16 @@ export default async function NouveauRapportPage() {
       <header className="flex flex-col gap-2">
         <Link
           href="/rapports"
-          className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-primary"
         >
           <ArrowLeft className="size-4" aria-hidden="true" />
           Retour aux rapports
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Nouveau rapport d&apos;accouchement
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Créez et enregistrez un rapport médical post-opératoire.
-        </p>
+        <PageHeader
+          title="Nouveau rapport d'accouchement"
+          description="Créez et enregistrez un rapport médical post-opératoire."
+          className="!gap-y-1"
+        />
       </header>
 
       <ReportForm operatorName={doctor?.name ?? ""} />

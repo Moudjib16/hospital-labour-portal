@@ -23,6 +23,7 @@ import { operationTypeLabels } from "@/lib/report-labels";
 import { OperationType } from "@/generated/prisma/enums";
 import { Prisma } from "@/generated/prisma/client";
 import { ReportFilters, type ReportFiltersValue } from "@/components/report-filters";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -93,21 +94,19 @@ export default async function RapportsPage({
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Rapports</h1>
-          <p className="text-sm text-muted-foreground">
-            Rapports médicaux post-opératoires et post-accouchement.
-          </p>
-        </div>
-        <Link
-          href="/rapports/nouveau"
-          className={buttonVariants({ variant: "default" })}
-        >
-          <Plus aria-hidden="true" />
-          Nouveau rapport
-        </Link>
-      </header>
+      <PageHeader
+        title="Rapports"
+        description="Rapports médicaux post-opératoires et post-accouchement."
+        action={
+          <Link
+            href="/rapports/nouveau"
+            className={buttonVariants({ variant: "default" })}
+          >
+            <Plus aria-hidden="true" />
+            Nouveau rapport
+          </Link>
+        }
+      />
 
       <ReportFilters filters={filters} />
 
