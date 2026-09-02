@@ -19,9 +19,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  operationTypeLabels,
-} from "@/lib/report-labels";
+import { operationTypeLabels } from "@/lib/report-labels";
+import { OperationType } from "@/generated/prisma/enums";
+import { Prisma } from "@/generated/prisma/client";
+import { ReportFilters, type ReportFiltersValue } from "@/components/report-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -38,11 +39,57 @@ function formatDate(date: Date): string {
   return dateFormatter.format(date);
 }
 
-export default async function RapportsPage() {
+export default async function RapportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const sp = await searchParams;
+  const q = typeof sp.q === "string" ? sp.q.trim() : "";
+  const operation = typeof sp.operation === "string" ? sp.operation : "";
+  const from = typeof sp.from === "string" ? sp.from : "";
+  const to = typeof sp.to === "string" ? sp.to : "";
+
+  const where: Prisma.LabourReportWhereInput = {};
+
+  if (q) {
+    where.OR = [
+      { firstName: { contains: q, mode: "insensitive" } },
+      { lastName: { contains: q, mode: "insensitive" } },
+      { operatorFullName: { contains: q, mode: "insensitive" } },
+      { anesthesiologistFullName: { contains: q, mode: "insensitive" } },
+    ];
+  }
+
+  if (operation && (Object.values(OperationType) as string[]).includes(operation)) {
+    where.operationType = operation as OperationType;
+  }
+
+  if (from || to) {
+    where.deliveryDate = {};
+    if (from) {
+      where.deliveryDate.gte = new Date(`${from}T00:00:00`);
+    }
+    if (to) {
+      where.deliveryDate.lte = new Date(`${to}T23:59:59`);
+    }
+  }
+
   const reports = await db.labourReport.findMany({
+    where,
     orderBy: { createdAt: "desc" },
     take: 100,
   });
+
+  const filters: ReportFiltersValue = {
+    q: q || undefined,
+    operation: operation || undefined,
+    from: from || undefined,
+    to: to || undefined,
+  };
+
+  const filtered =
+    !!(q || operation || from || to) || reports.length === 100;
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -62,16 +109,18 @@ export default async function RapportsPage() {
         </Link>
       </header>
 
+      <ReportFilters filters={filters} />
+
       {reports.length === 0 ? (
         <Card>
           <CardHeader>
             <CardTitle>Liste des rapports</CardTitle>
             <CardDescription>
-              Créez votre premier rapport d&apos;accouchement.
+              Aucun rapport ne correspond aux critères sélectionnés.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
-            Aucun rapport créé pour le moment.
+            Modifiez vos filtres ou créez un nouveau rapport.
           </CardContent>
         </Card>
       ) : (
@@ -80,7 +129,8 @@ export default async function RapportsPage() {
             <CardTitle>Liste des rapports</CardTitle>
             <CardDescription>
               {reports.length} rapport{reports.length > 1 ? "s" : ""} trouvé
-              {reports.length > 1 ? "s" : ""}.
+              {reports.length > 1 ? "s" : ""}
+              {filtered && reports.length === 100 ? " (limité aux 100 plus récents)" : ""}.
             </CardDescription>
           </CardHeader>
           <CardContent>
