@@ -8,6 +8,8 @@ import {
   bloodTypeLabels,
   operationTypeLabels,
 } from "@/lib/report-labels";
+import { AutoPrint } from "@/components/auto-print";
+import { PrintButton } from "@/components/print-button";
 import {
   Card,
   CardContent,
@@ -29,12 +31,15 @@ const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
 
 type ReportDetailPageProps = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function ReportDetailPage({
   params,
+  searchParams,
 }: ReportDetailPageProps) {
   const { id } = await params;
+  const sp = await searchParams;
 
   const report = await db.labourReport.findUnique({ where: { id } });
   if (!report) {
@@ -43,7 +48,8 @@ export default async function ReportDetailPage({
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <header className="flex flex-col gap-2">
+      <AutoPrint enabled={sp.print === "1"} />
+      <header className="flex flex-col gap-2 print:hidden">
         <Link
           href="/rapports"
           className="flex w-fit items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -51,17 +57,31 @@ export default async function ReportDetailPage({
           <ArrowLeft className="size-4" aria-hidden="true" />
           Retour aux rapports
         </Link>
-        <h1 className="text-2xl font-bold tracking-tight">
-          Rapport d&apos;accouchement
-        </h1>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold tracking-tight">
+            Rapport d&apos;accouchement
+          </h1>
+          <PrintButton />
+        </div>
         <p className="text-sm text-muted-foreground">
           {report.firstName} {report.lastName} —{" "}
           {operationTypeLabels[report.operationType]}
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
-        <Card>
+      <div className="hidden print:mb-6 print:block">
+        <h1 className="text-xl font-bold">Rapport d&apos;accouchement</h1>
+        <p className="text-sm">
+          {report.firstName} {report.lastName} —{" "}
+          {operationTypeLabels[report.operationType]}
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {dateFormatter.format(report.deliveryDate)}
+        </p>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_360px] print:grid-cols-1">
+        <Card className="print:break-inside-avoid">
           <CardHeader>
             <CardTitle>Description de l&apos;intervention</CardTitle>
           </CardHeader>
@@ -71,7 +91,7 @@ export default async function ReportDetailPage({
         </Card>
 
         <div className="space-y-6">
-          <Card>
+          <Card className="print:break-inside-avoid">
             <CardHeader>
               <CardTitle>Patient</CardTitle>
               <CardDescription>Informations enregistrées.</CardDescription>
@@ -87,7 +107,7 @@ export default async function ReportDetailPage({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="print:break-inside-avoid">
             <CardHeader>
               <CardTitle>Intervention</CardTitle>
             </CardHeader>

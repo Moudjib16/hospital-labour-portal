@@ -11,6 +11,8 @@ export type CreateReportState = {
   error?: string;
 };
 
+type SaveReportResult = { id: string } | { error: string };
+
 function getString(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
@@ -36,6 +38,30 @@ export async function createReport(
   _prevState: CreateReportState,
   formData: FormData
 ): Promise<CreateReportState> {
+  const result = await saveReportFromForm(formData);
+  if ("error" in result) {
+    return { error: result.error };
+  }
+
+  revalidatePath("/rapports");
+  redirect("/rapports");
+}
+
+export async function createAndPrintReport(
+  formData: FormData
+): Promise<SaveReportResult> {
+  const result = await saveReportFromForm(formData);
+  if ("error" in result) {
+    return result;
+  }
+
+  revalidatePath("/rapports");
+  return result;
+}
+
+async function saveReportFromForm(
+  formData: FormData
+): Promise<SaveReportResult> {
   const session = await auth();
   const doctorId = session?.user?.id;
   if (!doctorId) {
@@ -119,7 +145,7 @@ export async function createReport(
     },
   });
 
-  await db.labourReport.create({
+  const report = await db.labourReport.create({
     data: {
       patientId: patient.id,
       doctorId: doctor.id,
@@ -138,6 +164,5 @@ export async function createReport(
     },
   });
 
-  revalidatePath("/rapports");
-  redirect("/rapports");
+  return { id: report.id };
 }
