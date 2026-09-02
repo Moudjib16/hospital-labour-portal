@@ -1,6 +1,8 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
+import { db } from "@/lib/db";
 import {
   Card,
   CardContent,
@@ -8,6 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { UserManagement } from "@/components/user-management";
+
+export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Paramètres",
+};
 
 export default async function ParametresPage() {
   const session = await auth();
@@ -16,25 +25,41 @@ export default async function ParametresPage() {
     redirect("/tableau-de-bord");
   }
 
+  const users = await db.user.findMany({
+    orderBy: [{ role: "asc" }, { username: "asc" }],
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      role: true,
+      isActive: true,
+      createdAt: true,
+    },
+  });
+
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
       <header>
         <h1 className="text-2xl font-bold tracking-tight">Paramètres</h1>
         <p className="text-sm text-muted-foreground">
-          Configuration du compte et de l&apos;application.
+          Gestion des comptes utilisateurs et configuration de
+          l&apos;application.
         </p>
       </header>
 
       <Card>
         <CardHeader>
-          <CardTitle>Profil</CardTitle>
+          <CardTitle>Utilisateurs</CardTitle>
           <CardDescription>
-            Gestion de vos informations personnelles.
+            Gérez les comptes médecins et administrateurs, ainsi que leurs
+            accès.
           </CardDescription>
         </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          Les options de configuration seront disponibles dans une version
-          ultérieure.
+        <CardContent>
+          <UserManagement
+            users={users}
+            currentUserId={session.user.id ?? ""}
+          />
         </CardContent>
       </Card>
     </div>

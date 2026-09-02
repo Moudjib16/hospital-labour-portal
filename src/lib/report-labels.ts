@@ -1,4 +1,9 @@
-import { BloodType, OperationType } from "@/generated/prisma/enums";
+import { BloodType, OperationType, Role } from "@/generated/prisma/enums";
+
+export const roleLabels: Record<Role, string> = {
+  ADMIN: "Administrateur",
+  DOCTOR: "Médecin",
+};
 
 export const operationTypeLabels: Record<OperationType, string> = {
   NATURAL_DELIVERY: "Accouchement naturel",

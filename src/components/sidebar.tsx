@@ -12,10 +12,14 @@ import {
 
 type SidebarProps = {
   activePath: string;
+  isAdmin: boolean;
 };
 
-export function Sidebar({ activePath }: SidebarProps) {
+export function Sidebar({ activePath, isAdmin }: SidebarProps) {
   const isActive = (href: string) => activePath === href;
+  const visibleFooterLinks = isAdmin
+    ? footerNavLinks
+    : footerNavLinks.filter((link) => link.href !== "/parametres");
 
   return (
     <aside className="flex h-full w-64 shrink-0 flex-col bg-slate-900 text-slate-100">
@@ -42,7 +46,7 @@ export function Sidebar({ activePath }: SidebarProps) {
         </div>
 
         <div className="mt-auto space-y-1">
-          {footerNavLinks.map((link) => (
+          {visibleFooterLinks.map((link) => (
             <NavItem key={link.href} link={link} active={isActive(link.href)} />
           ))}
           <SidebarFooter />

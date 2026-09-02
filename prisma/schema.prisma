@@ -49,6 +49,7 @@ model User {
   name         String
   passwordHash String
   role         Role          @default(DOCTOR)
+  isActive     Boolean       @default(true)
   reports      LabourReport[]
 
   createdAt DateTime @default(now())
