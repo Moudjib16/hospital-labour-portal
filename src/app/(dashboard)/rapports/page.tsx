@@ -24,8 +24,11 @@ import { OperationType } from "@/generated/prisma/enums";
 import { Prisma } from "@/generated/prisma/client";
 import { ReportFilters, type ReportFiltersValue } from "@/components/report-filters";
 import { PageHeader } from "@/components/page-header";
+import { Pagination } from "@/components/pagination";
 
 export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 20;
 
 export const metadata: Metadata = {
   title: "Rapports",
@@ -50,6 +53,8 @@ export default async function RapportsPage({
   const operation = typeof sp.operation === "string" ? sp.operation : "";
   const from = typeof sp.from === "string" ? sp.from : "";
   const to = typeof sp.to === "string" ? sp.to : "";
+  const rawPage = typeof sp.page === "string" ? Number.parseInt(sp.page, 10) : 1;
+  const page = Number.isFinite(rawPage) && rawPage > 0 ? rawPage : 1;
 
   const where: Prisma.LabourReportWhereInput = {};
 
@@ -76,10 +81,15 @@ export default async function RapportsPage({
     }
   }
 
+  const totalReports = await db.labourReport.count({ where });
+  const totalPages = Math.max(1, Math.ceil(totalReports / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+
   const reports = await db.labourReport.findMany({
     where,
     orderBy: { createdAt: "desc" },
-    take: 100,
+    skip: (currentPage - 1) * PAGE_SIZE,
+    take: PAGE_SIZE,
   });
 
   const filters: ReportFiltersValue = {
@@ -89,8 +99,7 @@ export default async function RapportsPage({
     to: to || undefined,
   };
 
-  const filtered =
-    !!(q || operation || from || to) || reports.length === 100;
+  const filtered = !!(q || operation || from || to);
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
@@ -127,9 +136,9 @@ export default async function RapportsPage({
           <CardHeader>
             <CardTitle>Liste des rapports</CardTitle>
             <CardDescription>
-              {reports.length} rapport{reports.length > 1 ? "s" : ""} trouvé
-              {reports.length > 1 ? "s" : ""}
-              {filtered && reports.length === 100 ? " (limité aux 100 plus récents)" : ""}.
+              {totalReports} rapport{totalReports > 1 ? "s" : ""} trouvé
+              {totalReports > 1 ? "s" : ""}
+              {filtered ? " selon les critères sélectionnés." : "."}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -164,6 +173,12 @@ export default async function RapportsPage({
                 ))}
               </TableBody>
             </Table>
+            <Pagination
+              path="/rapports"
+              page={currentPage}
+              totalPages={totalPages}
+              params={{ q, operation, from, to }}
+            />
           </CardContent>
         </Card>
       )}
