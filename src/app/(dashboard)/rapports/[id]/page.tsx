@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Baby, Stethoscope } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { db } from "@/lib/db";
 import {
@@ -11,13 +11,6 @@ import {
 import { AutoPrint } from "@/components/auto-print";
 import { PrintButton } from "@/components/print-button";
 import { PageHeader } from "@/components/page-header";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +21,12 @@ export const metadata: Metadata = {
 const dateFormatter = new Intl.DateTimeFormat("fr-FR", {
   dateStyle: "long",
   timeStyle: "short",
+});
+
+const shortDateFormatter = new Intl.DateTimeFormat("fr-FR", {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
 });
 
 type ReportDetailPageProps = {
@@ -50,7 +49,7 @@ export default async function ReportDetailPage({
   const patientName = `${report.firstName} ${report.lastName}`;
 
   return (
-    <div className="report-print flex flex-col gap-6 p-6 lg:p-8">
+    <div className="flex flex-col gap-6 p-6 lg:p-8">
       <AutoPrint enabled={sp.print === "1"} />
 
       <div className="flex flex-col gap-2 print:hidden">
@@ -63,108 +62,139 @@ export default async function ReportDetailPage({
         </Link>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <PageHeader
-            title="Rapport d'accouchement"
+            title="Protocole opératoire"
             description={`${patientName} — ${operationTypeLabels[report.operationType]}`}
           />
           <PrintButton />
         </div>
       </div>
 
-      <div className="hidden print:flex print:mb-6 print:flex-col print:gap-1">
-        <div className="flex items-center justify-between gap-4 text-sm">
-          <span className="font-medium">{patientName}</span>
-          <span className="text-muted-foreground">
-            {dateFormatter.format(report.deliveryDate)}
-          </span>
-        </div>
-        <h1 className="border-b-2 border-slate-900 pb-1 text-sm font-bold uppercase tracking-tight">
-          Rapport d&apos;accouchement
-        </h1>
-      </div>
+      <div className="report-doc mx-auto w-full max-w-4xl bg-background text-sm text-foreground print:max-w-none print:text-[0.72rem]">
+        {/* 1. Hospital header / En-tête */}
+        <header className="border-b-2 border-slate-900 pb-2 text-center">
+          <div className="text-sm font-bold uppercase leading-snug sm:text-base">
+            Établissement Hospitalier Spécialisé
+          </div>
+          <div className="text-sm font-bold uppercase leading-snug sm:text-base">
+            Mère Enfant de Sidi Mabrouk
+          </div>
+          <div className="mt-0.5 text-xs sm:text-sm">
+            Service de Gynécologie Obstétrique
+          </div>
+          <div className="mt-0.5 text-xs sm:text-sm">Pr. A. SELLAHI</div>
+          <div className="text-xs sm:text-sm">Chef de Service</div>
+        </header>
 
-      <div className="grid gap-6 lg:grid-cols-2 print:grid-cols-2 print:gap-2">
-        <Card className="print:break-inside-avoid">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary print:hidden">
-              <Baby className="size-4" aria-hidden="true" />
-            </span>
-            <div>
-              <CardTitle>Patient</CardTitle>
-              <CardDescription className="print:hidden">
-                Informations enregistrées.
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm print-compact-info print:grid-cols-2 print:gap-x-4 print:gap-y-1">
-              <InfoRow label="Nom" value={`${report.firstName} ${report.lastName}`} />
-              <InfoRow label="Âge" value={`${report.age} ans`} />
-              <InfoRow label="Nationalité" value={report.nationality} />
-              <InfoRow
+        {/* 2. Patient & staff metadata grid */}
+        <section className="mt-5 grid gap-5 sm:grid-cols-2 print:mt-3 print:gap-4">
+          <div className="rounded-lg border border-border p-4 sm:p-5 print:border print:border-border print:p-3">
+            <FieldLabel>Patient</FieldLabel>
+            <dl className="mt-3 space-y-2.5 print:mt-2 print:space-y-1.5">
+              <Field label="Nom" value={report.lastName} />
+              <Field label="Prénom" value={report.firstName} />
+              <Field label="Âge" value={`${report.age} ans`} />
+              <Field label="Nationalité" value={report.nationality} />
+              <Field
                 label="Groupe sanguin"
                 value={bloodTypeLabels[report.bloodType]}
               />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="print:break-inside-avoid">
-          <CardHeader className="flex flex-row items-center gap-2">
-            <span className="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary print:hidden">
-              <Stethoscope className="size-4" aria-hidden="true" />
-            </span>
-            <div>
-              <CardTitle>Intervention</CardTitle>
-              <CardDescription className="print:hidden">
-                Détails de l&apos;opération.
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm print-compact-info print:space-y-1">
-            <InfoRow
-              label="Type"
-              value={operationTypeLabels[report.operationType]}
-            />
-            <InfoRow label="Date" value={dateFormatter.format(report.deliveryDate)} />
-            <InfoRow label="Opérateur" value={report.operatorFullName} />
-            <InfoRow
-              label="Anesthésiste"
-              value={report.anesthesiologistFullName}
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="print:break-inside-avoid">
-        <CardHeader>
-          <CardTitle>Description de l&apos;intervention</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 text-sm leading-relaxed print-compact-desc print:space-y-2">
-          <div className="whitespace-pre-wrap">{report.fullDescription}</div>
-
-          <div className="grid gap-4 border-t border-border pt-4 sm:grid-cols-2 print-compact-info print:grid-cols-2 print:gap-x-4 print:gap-y-1 print:border-t print:pt-2">
-            <InfoRow
-              label="Complications"
-              value={report.complications ?? "Aucune"}
-            />
-            <InfoRow
-              label="Notes post-op"
-              value={report.postOpNotes ?? "—"}
-            />
+            </dl>
           </div>
-        </CardContent>
-      </Card>
+
+          <div className="rounded-lg border border-border p-4 sm:p-5 print:border print:border-border print:p-3">
+            <FieldLabel>Équipe & intervention</FieldLabel>
+            <dl className="mt-3 space-y-2.5 print:mt-2 print:space-y-1.5">
+              <Field label="Opérateur" value={report.operatorFullName} />
+              <Field
+                label="Anesthésiste"
+                value={report.anesthesiologistFullName}
+              />
+              <Field
+                label="Intervention"
+                value={operationTypeLabels[report.operationType]}
+              />
+              <Field
+                label="Opérée le"
+                value={shortDateFormatter.format(report.deliveryDate)}
+              />
+            </dl>
+          </div>
+        </section>
+
+        {/* 3. Detailed operative protocol */}
+        <section className="mt-4 print:mt-3">
+          <div className="border-b border-slate-900 pb-1 text-xs font-bold uppercase tracking-wide sm:text-sm">
+            Compte-Rendu Opératoire
+          </div>
+          <div className="mt-2 whitespace-pre-wrap leading-relaxed">
+            {report.fullDescription}
+          </div>
+
+          {(report.complications || report.postOpNotes) && (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 print:mt-2 print:gap-3">
+              {report.complications ? (
+                <div className="space-y-1">
+                  <FieldLabel>Complications</FieldLabel>
+                  <p className="whitespace-pre-wrap leading-relaxed">
+                    {report.complications}
+                  </p>
+                </div>
+              ) : null}
+              {report.postOpNotes ? (
+                <div className="space-y-1">
+                  <FieldLabel>Notes post-opératoires</FieldLabel>
+                  <p className="whitespace-pre-wrap leading-relaxed">
+                    {report.postOpNotes}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          )}
+        </section>
+
+        {/* 4. Footer / sign-off */}
+        <footer className="mt-6 flex items-end justify-between print:mt-4">
+          <div>
+            <p className="text-xs font-semibold uppercase text-muted-foreground">
+              Secrétariat médical
+            </p>
+            <div className="mt-1 h-14 w-44 rounded border border-dashed border-slate-400 print:h-12 print:w-36">
+              <div className="flex h-full items-center justify-center px-2 text-center text-[0.68rem] text-muted-foreground">
+                Signature / Cachet
+              </div>
+            </div>
+          </div>
+          <p className="text-[0.68rem] text-muted-foreground">
+            Du : {dateFormatter.format(report.createdAt)}
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+// ─────────────────────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────────────────────
+
+function FieldLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-dashed border-border/60 pb-1.5">
-      <dt className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    <div className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-900">
+      {children}
+      <span className="h-0.5 flex-1 rounded-full bg-primary/40" />
+    </div>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-dashed border-slate-300 pb-2 print:pb-1">
+      <dt className="shrink-0 text-xs font-semibold uppercase tracking-wide text-slate-500">
         {label}
       </dt>
-      <dd className="text-right font-medium text-foreground">{value}</dd>
+      <dd className="text-right text-sm font-bold text-slate-900">
+        {value || "—"}
+      </dd>
     </div>
   );
 }

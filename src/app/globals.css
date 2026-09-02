@@ -135,42 +135,12 @@
     -webkit-print-color-adjust: exact;
   }
 
-  /* Compact the whole report onto a single page */
-  .report-print {
-    gap: 0.5rem !important;
-    padding: 0 !important;
-  }
-  .report-print [data-slot="card"] {
-    padding: 0 0 0.5rem;
-    gap: 0.35rem;
-    box-shadow: none;
-    border-radius: 0;
-  }
-  .report-print [data-slot="card-header"] {
-    padding: 0 0 0.25rem;
-    gap: 0;
-  }
-  .report-print [data-slot="card-title"] {
-    font-size: 0.7rem;
-    line-height: 1.1;
-  }
-  .report-print [data-slot="card-description"] {
-    font-size: 0.6rem;
-    line-height: 1.1;
-  }
-  .report-print [data-slot="card-content"] {
-    padding: 0;
-  }
-  .report-print .print-compact-desc {
+  /* Ensure the operative protocol fits on a single page */
+  .report-doc {
     font-size: 0.72rem;
-    line-height: 1.35;
   }
-  .report-print .print-compact-info dt {
-    font-size: 0.55rem;
-    padding-bottom: 0.15rem;
-  }
-  .report-print .print-compact-info dd {
-    font-size: 0.7rem;
-    padding-bottom: 0.15rem;
+  .report-doc .whitespace-pre-wrap {
+    font-size: 0.72rem;
+    line-height: 1.4;
   }
 }
