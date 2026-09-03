@@ -70,7 +70,7 @@ export default async function DashboardPage() {
           value={String(stats.totalBirths)}
           icon={<Baby className="size-5" />}
           accent="border-l-primary"
-          gradient="from-primary/5 to-primary/10"
+          gradient="from-primary/10 to-primary/15"
           iconClass="bg-primary/10 text-primary"
         />
         <StatCard
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
           value={String(stats.naturalDeliveries)}
           icon={<Activity className="size-5" />}
           accent="border-l-emerald-500"
-          gradient="from-emerald-500/5 to-emerald-500/10"
+          gradient="from-emerald-500/10 to-emerald-500/15"
           iconClass="bg-emerald-500/10 text-emerald-600"
         />
         <StatCard
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
           value={String(stats.cSections)}
           icon={<Stethoscope className="size-5" />}
           accent="border-l-sky-500"
-          gradient="from-sky-500/5 to-sky-500/10"
+          gradient="from-sky-500/10 to-sky-500/15"
           iconClass="bg-sky-500/10 text-sky-600"
         />
         <StatCard
@@ -94,7 +94,7 @@ export default async function DashboardPage() {
           value={String(totalPatients)}
           icon={<Users className="size-5" />}
           accent="border-l-violet-500"
-          gradient="from-violet-500/5 to-violet-500/10"
+          gradient="from-violet-500/10 to-violet-500/15"
           iconClass="bg-violet-500/10 text-violet-600"
         />
       </div>
