@@ -18,7 +18,7 @@ const OPERATORS = [
 ];
 
 const BLOOD_TYPES = ["O_POS", "O_NEG", "A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG"] as const;
-const OPERATION_TYPES = ["NATURAL_DELIVERY", "EMERGENCY_C_SECTION", "SCHEDULED_C_SECTION"] as const;
+const OPERATION_TYPES = ["CESARIAN", "OPERATION_PROGRAMME"] as const;
 
 const FIRST_NAMES = [
   "Amina", "Fatima", "Yasmina", "Khadidja", "Meriem", "Sofia", "Nadia",
@@ -50,17 +50,7 @@ function makeDescription(op: (typeof OPERATION_TYPES)[number]): string {
     "Bilan pré-opératoire complet et valide (groupage, NFS, hémostase). " +
     "Consentement éclairé signé. Antiseptie large et mise en place d'une voie veineuse périphérique. ";
 
-  if (op === "NATURAL_DELIVERY") {
-    return (
-      base +
-      "Travail spontané d'une durée totale de 7 heures, dilatation complète atteinte progressivement sous analgésie péridurale. " +
-      "Expulsion dirigée en position dorsale. Naissance d'un nouveau-né en bonne adaptation à la vie extra-utérine, Apgar 9/10. " +
-      "Délivrance naturelle complète, globe utérin correct, saignement minime. " +
-      "Suites immédiates simples, retour en salle d'hospitalisation sans incident."
-    );
-  }
-
-  if (op === "EMERGENCY_C_SECTION") {
+  if (op === "CESARIAN") {
     return (
       base +
       "Césarienne en urgence décidée devant un syndrome d'apnée fœtale (RCF pathologique). " +
@@ -72,10 +62,10 @@ function makeDescription(op: (typeof OPERATION_TYPES)[number]): string {
     );
   }
 
-  // SCHEDULED_C_SECTION
+  // OPERATION_PROGRAMME
   return (
     base +
-    "Césarienne programmée pour présentation par le siège. Rachianesthésie réalisée. " +
+    "Opération programmée pour présentation par le siège. Rachianesthésie réalisée. " +
     "Incision de Pfannenstiel, hystérotomie segmentaire transversale arciforme (HSTA). " +
     "Extraction podalique d'un enfant vivant, Apgar 9/10. " +
     "Délivrance artificielle et révision utérine (DA + RU). " +
@@ -84,8 +74,7 @@ function makeDescription(op: (typeof OPERATION_TYPES)[number]): string {
   );
 }
 
-function makePostOp(op: (typeof OPERATION_TYPES)[number]): string {
-  if (op === "NATURAL_DELIVERY") return "Suites simples, sortie à J+2.";
+function makePostOp(): string {
   return "Suites simples, sortie à J+3. Surveillance de la cicatrice à J+7.";
 }
 
@@ -248,7 +237,7 @@ async function main() {
         ]),
         complications: makeComplications(),
         fullDescription: makeDescription(op),
-        postOpNotes: makePostOp(op),
+        postOpNotes: makePostOp(),
       },
     });
     reportsCreated++;

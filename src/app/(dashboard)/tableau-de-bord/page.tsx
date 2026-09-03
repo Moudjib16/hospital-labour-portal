@@ -66,24 +66,24 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          label="Naissances totales"
-          value={String(stats.totalBirths)}
-          icon={<Baby className="size-5" />}
+          label="Opérations totales"
+          value={String(stats.totalOperations)}
+          icon={<Activity className="size-5" />}
           accent="border-l-primary"
           gradient="from-primary/10 to-primary/15"
           iconClass="bg-primary/10 text-primary"
         />
         <StatCard
-          label="Accouchements naturels"
-          value={String(stats.naturalDeliveries)}
-          icon={<Activity className="size-5" />}
+          label="Césariennes"
+          value={String(stats.cesarians)}
+          icon={<Baby className="size-5" />}
           accent="border-l-emerald-500"
           gradient="from-emerald-500/10 to-emerald-500/15"
           iconClass="bg-emerald-500/10 text-emerald-600"
         />
         <StatCard
-          label="Césariennes"
-          value={String(stats.cSections)}
+          label="Opérations programmées"
+          value={String(stats.scheduledOps)}
           icon={<Stethoscope className="size-5" />}
           accent="border-l-sky-500"
           gradient="from-sky-500/10 to-sky-500/15"
@@ -101,21 +101,21 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 sm:grid-cols-3">
         <PeriodCard
-          label="Naissances aujourd'hui"
-          value={stats.today}
-          delta={stats.todayDelta}
+          label="Césariennes aujourd'hui"
+          value={stats.cesariansToday}
+          delta={stats.cesariansTodayDelta}
           icon={<CalendarClock className="size-4" />}
         />
         <PeriodCard
-          label="Cette semaine"
-          value={stats.week}
-          delta={stats.weekDelta}
+          label="Césariennes cette semaine"
+          value={stats.cesariansWeek}
+          delta={stats.cesariansWeekDelta}
           icon={<CalendarDays className="size-4" />}
         />
         <PeriodCard
-          label="Ce mois-ci"
-          value={stats.month}
-          delta={stats.monthDelta}
+          label="Césariennes ce mois-ci"
+          value={stats.cesariansMonth}
+          delta={stats.cesariansMonthDelta}
           icon={<CalendarDays className="size-4" />}
         />
       </div>
@@ -123,7 +123,7 @@ export default async function DashboardPage() {
       <div className="grid gap-4 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>Naissances par mois</CardTitle>
+            <CardTitle>Opérations par mois</CardTitle>
             <CardDescription>Les 6 derniers mois.</CardDescription>
           </CardHeader>
           <CardContent>
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
             <CardDescription>Type d&apos;intervention.</CardDescription>
           </CardHeader>
           <CardContent>
-            <DeliveryTypeChart stats={stats} />
+            <OperationTypeChart stats={stats} />
           </CardContent>
         </Card>
       </div>
@@ -288,30 +288,24 @@ function MonthlyChart({ data }: { data: Bar[] }) {
   );
 }
 
-function DeliveryTypeChart({ stats }: { stats: DashboardStats }) {
-  const total = Math.max(1, stats.totalBirths);
+function OperationTypeChart({ stats }: { stats: DashboardStats }) {
+  const total = Math.max(1, stats.totalOperations);
   const segments = [
     {
-      label: operationTypeLabels.NATURAL_DELIVERY,
-      value: stats.naturalDeliveries,
+      label: operationTypeLabels.CESARIAN,
+      value: stats.cesarians,
       color: "bg-emerald-500",
       dot: "bg-emerald-500",
     },
     {
-      label: operationTypeLabels.EMERGENCY_C_SECTION,
-      value: stats.emergencyCSections,
+      label: operationTypeLabels.OPERATION_PROGRAMME,
+      value: stats.scheduledOps,
       color: "bg-sky-500",
       dot: "bg-sky-500",
     },
-    {
-      label: operationTypeLabels.SCHEDULED_C_SECTION,
-      value: stats.scheduledCSections,
-      color: "bg-violet-500",
-      dot: "bg-violet-500",
-    },
   ];
 
-  if (stats.totalBirths === 0) {
+  if (stats.totalOperations === 0) {
     return (
       <p className="text-sm text-muted-foreground">
         Aucune donnée pour le moment.
@@ -358,17 +352,15 @@ function DeliveryTypeChart({ stats }: { stats: DashboardStats }) {
 // ─────────────────────────────────────────────────────────────
 
 type DashboardStats = {
-  totalBirths: number;
-  naturalDeliveries: number;
-  emergencyCSections: number;
-  scheduledCSections: number;
-  cSections: number;
-  today: number;
-  week: number;
-  month: number;
-  todayDelta: number;
-  weekDelta: number;
-  monthDelta: number;
+  totalOperations: number;
+  cesarians: number;
+  scheduledOps: number;
+  cesariansToday: number;
+  cesariansWeek: number;
+  cesariansMonth: number;
+  cesariansTodayDelta: number;
+  cesariansWeekDelta: number;
+  cesariansMonthDelta: number;
   monthlyCounts: Bar[];
 };
 
@@ -395,6 +387,19 @@ function countInRange(
   return reports.filter((r) => r.createdAt >= from && r.createdAt < to).length;
 }
 
+function countCesariansInRange(
+  reports: ReportMeta[],
+  from: Date,
+  to: Date
+): number {
+  return reports.filter(
+    (r) =>
+      r.operationType === OperationType.CESARIAN &&
+      r.createdAt >= from &&
+      r.createdAt < to
+  ).length;
+}
+
 function lastDayOfMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
 }
@@ -405,20 +410,20 @@ function computeStats(reports: ReportMeta[]): DashboardStats {
   const weekStart = startOfWeek(now);
   const monthStart = startOfMonth(now);
 
-  const today = countInRange(reports, todayStart, new Date(todayStart.getTime() + 86400000));
-  const week = countInRange(reports, weekStart, new Date(weekStart.getTime() + 7 * 86400000));
-  const month = countInRange(reports, monthStart, new Date(monthStart.getTime() + 31 * 86400000));
+  const cesariansToday = countCesariansInRange(reports, todayStart, new Date(todayStart.getTime() + 86400000));
+  const cesariansWeek = countCesariansInRange(reports, weekStart, new Date(weekStart.getTime() + 7 * 86400000));
+  const cesariansMonth = countCesariansInRange(reports, monthStart, new Date(monthStart.getTime() + 31 * 86400000));
 
   const prevDayStart = new Date(todayStart.getTime() - 86400000);
-  const prevDay = countInRange(reports, prevDayStart, todayStart);
+  const prevCesariansDay = countCesariansInRange(reports, prevDayStart, todayStart);
   const prevWeekStart = new Date(weekStart.getTime() - 7 * 86400000);
-  const prevWeek = countInRange(reports, prevWeekStart, weekStart);
+  const prevCesariansWeek = countCesariansInRange(reports, prevWeekStart, weekStart);
   const prevMonthStart = new Date(
     monthStart.getFullYear(),
     monthStart.getMonth() - 1,
     1
   );
-  const prevMonth = countInRange(
+  const prevCesariansMonth = countCesariansInRange(
     reports,
     prevMonthStart,
     new Date(
@@ -431,9 +436,9 @@ function computeStats(reports: ReportMeta[]): DashboardStats {
     )
   );
 
-  const todayDelta = today - prevDay;
-  const weekDelta = week - prevWeek;
-  const monthDelta = month - prevMonth;
+  const cesariansTodayDelta = cesariansToday - prevCesariansDay;
+  const cesariansWeekDelta = cesariansWeek - prevCesariansWeek;
+  const cesariansMonthDelta = cesariansMonth - prevCesariansMonth;
 
   const monthlyCounts: Bar[] = [];
   for (let i = 5; i >= 0; i--) {
@@ -448,27 +453,19 @@ function computeStats(reports: ReportMeta[]): DashboardStats {
   }
 
   return {
-    totalBirths: reports.length,
-    naturalDeliveries: reports.filter(
-      (r) => r.operationType === OperationType.NATURAL_DELIVERY
+    totalOperations: reports.length,
+    cesarians: reports.filter(
+      (r) => r.operationType === OperationType.CESARIAN
     ).length,
-    emergencyCSections: reports.filter(
-      (r) => r.operationType === OperationType.EMERGENCY_C_SECTION
+    scheduledOps: reports.filter(
+      (r) => r.operationType === OperationType.OPERATION_PROGRAMME
     ).length,
-    scheduledCSections: reports.filter(
-      (r) => r.operationType === OperationType.SCHEDULED_C_SECTION
-    ).length,
-    cSections: reports.filter(
-      (r) =>
-        r.operationType === OperationType.EMERGENCY_C_SECTION ||
-        r.operationType === OperationType.SCHEDULED_C_SECTION
-    ).length,
-    today,
-    week,
-    month,
-    todayDelta,
-    weekDelta,
-    monthDelta,
+    cesariansToday,
+    cesariansWeek,
+    cesariansMonth,
+    cesariansTodayDelta,
+    cesariansWeekDelta,
+    cesariansMonthDelta,
     monthlyCounts,
   };
 }

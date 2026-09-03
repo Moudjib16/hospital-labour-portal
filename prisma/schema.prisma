@@ -23,9 +23,8 @@ enum Role {
 }
 
 enum OperationType {
-  NATURAL_DELIVERY
-  EMERGENCY_C_SECTION
-  SCHEDULED_C_SECTION
+  CESARIAN
+  OPERATION_PROGRAMME
 }
 
 enum BloodType {

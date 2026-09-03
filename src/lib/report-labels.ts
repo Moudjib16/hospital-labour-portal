@@ -6,9 +6,8 @@ export const roleLabels: Record<Role, string> = {
 };
 
 export const operationTypeLabels: Record<OperationType, string> = {
-  NATURAL_DELIVERY: "Accouchement naturel",
-  EMERGENCY_C_SECTION: "Césarienne en urgence",
-  SCHEDULED_C_SECTION: "Césarienne programmée",
+  CESARIAN: "Césarienne",
+  OPERATION_PROGRAMME: "Opération programmée",
 };
 
 export const bloodTypeLabels: Record<BloodType, string> = {
