@@ -47,8 +47,11 @@ export function PatientTable({ patients }: PatientTableProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {patients.map((patient) => (
-          <TableRow key={patient.id}>
+        {patients.map((patient, index) => (
+          <TableRow
+            key={patient.id}
+            className={index % 2 === 1 ? "bg-sky-100" : undefined}
+          >
             <TableCell className="font-medium">
               <Link
                 href={`/patients/${patient.id}`}

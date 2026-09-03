@@ -70,6 +70,7 @@ export default async function DashboardPage() {
           value={String(stats.totalBirths)}
           icon={<Baby className="size-5" />}
           accent="border-l-primary"
+          gradient="from-primary/5 to-primary/10"
           iconClass="bg-primary/10 text-primary"
         />
         <StatCard
@@ -77,6 +78,7 @@ export default async function DashboardPage() {
           value={String(stats.naturalDeliveries)}
           icon={<Activity className="size-5" />}
           accent="border-l-emerald-500"
+          gradient="from-emerald-500/5 to-emerald-500/10"
           iconClass="bg-emerald-500/10 text-emerald-600"
         />
         <StatCard
@@ -84,6 +86,7 @@ export default async function DashboardPage() {
           value={String(stats.cSections)}
           icon={<Stethoscope className="size-5" />}
           accent="border-l-sky-500"
+          gradient="from-sky-500/5 to-sky-500/10"
           iconClass="bg-sky-500/10 text-sky-600"
         />
         <StatCard
@@ -91,6 +94,7 @@ export default async function DashboardPage() {
           value={String(totalPatients)}
           icon={<Users className="size-5" />}
           accent="border-l-violet-500"
+          gradient="from-violet-500/5 to-violet-500/10"
           iconClass="bg-violet-500/10 text-violet-600"
         />
       </div>
@@ -140,55 +144,6 @@ export default async function DashboardPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Activité par personnel</CardTitle>
-          <CardDescription>
-            Les praticiens ayant effectué le plus d&apos;interventions.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {stats.topOperators.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Aucune intervention enregistrée pour le moment.
-            </p>
-          ) : (
-            <ul className="space-y-4">
-              {stats.topOperators.map((op, i) => (
-                <li key={op.name}>
-                  <div className="mb-1.5 flex items-center justify-between gap-4 text-sm">
-                    <span className="flex items-center gap-2 font-medium text-foreground">
-                      <span
-                        className={cn(
-                          "flex size-6 items-center justify-center rounded-md text-xs font-semibold",
-                          i === 0
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted text-muted-foreground"
-                        )}
-                      >
-                        {i + 1}
-                      </span>
-                      {op.name}
-                    </span>
-                    <span className="text-muted-foreground">
-                      {op.count} intervention{op.count > 1 ? "s" : ""}
-                    </span>
-                  </div>
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-primary"
-                      style={{
-                        width: `${stats.topOperatorsMax ? (op.count / stats.topOperatorsMax) * 100 : 0}%`,
-                      }}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
           <CardTitle>Activité récente</CardTitle>
           <CardDescription>Les derniers rapports créés.</CardDescription>
         </CardHeader>
@@ -228,12 +183,13 @@ type StatCardProps = {
   value: string;
   icon: ReactNode;
   accent: string;
+  gradient: string;
   iconClass: string;
 };
 
-function StatCard({ label, value, icon, accent, iconClass }: StatCardProps) {
+function StatCard({ label, value, icon, accent, gradient, iconClass }: StatCardProps) {
   return (
-    <Card className={cn("border-l-4", accent)}>
+    <Card className={cn("border-l-4 bg-gradient-to-br", accent, gradient)}>
       <CardHeader className="pb-1">
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -414,8 +370,6 @@ type DashboardStats = {
   weekDelta: number;
   monthDelta: number;
   monthlyCounts: Bar[];
-  topOperators: { name: string; count: number }[];
-  topOperatorsMax: number;
 };
 
 function startOfDay(d: Date): Date {
@@ -493,16 +447,6 @@ function computeStats(reports: ReportMeta[]): DashboardStats {
     });
   }
 
-  const byOperator = new Map<string, number>();
-  for (const r of reports) {
-    byOperator.set(r.operatorFullName, (byOperator.get(r.operatorFullName) ?? 0) + 1);
-  }
-  const topOperators = [...byOperator.entries()]
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
-  const topOperatorsMax = topOperators.length ? topOperators[0].count : 0;
-
   return {
     totalBirths: reports.length,
     naturalDeliveries: reports.filter(
@@ -526,7 +470,5 @@ function computeStats(reports: ReportMeta[]): DashboardStats {
     weekDelta,
     monthDelta,
     monthlyCounts,
-    topOperators,
-    topOperatorsMax,
   };
 }

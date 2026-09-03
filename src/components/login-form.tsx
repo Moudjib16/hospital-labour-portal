@@ -1,3 +1,7 @@
+/**
+ * Portail Hospitalier — Rapports Médicaux
+ * Développé par Zerrougue Abdelmoudjib
+ */
 "use client";
 
 import { useActionState } from "react";

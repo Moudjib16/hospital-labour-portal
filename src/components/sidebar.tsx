@@ -1,3 +1,7 @@
+/**
+ * Portail Hospitalier — Rapports Médicaux
+ * Développé par Zerrougue Abdelmoudjib
+ */
 import Link from "next/link";
 import { Activity, LogOut } from "lucide-react";
 

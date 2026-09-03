@@ -1,3 +1,7 @@
+/**
+ * Portail Hospitalier — Rapports Médicaux
+ * Développé par Zerrougue Abdelmoudjib
+ */
 import { AuthError } from "next-auth";
 import { signIn, auth } from "@/auth";
 import { redirect } from "next/navigation";

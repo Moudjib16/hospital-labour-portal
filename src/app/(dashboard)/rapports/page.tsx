@@ -153,8 +153,11 @@ export default async function RapportsPage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {reports.map((report) => (
-                  <TableRow key={report.id}>
+                {reports.map((report, index) => (
+                  <TableRow
+                    key={report.id}
+                    className={index % 2 === 1 ? "bg-sky-100" : undefined}
+                  >
                     <TableCell className="font-medium">
                       <Link
                         href={`/rapports/${report.id}`}

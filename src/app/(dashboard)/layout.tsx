@@ -1,3 +1,7 @@
+/**
+ * Portail Hospitalier — Rapports Médicaux
+ * Développé par Zerrougue Abdelmoudjib
+ */
 import { type ReactNode } from "react";
 
 import { auth } from "@/auth";
