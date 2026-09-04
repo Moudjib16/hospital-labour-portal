@@ -51,7 +51,7 @@ export default async function ReportDetailPage({
 
   return (
     <div className="flex flex-col gap-6 p-6 lg:p-8">
-      <AutoPrint enabled={sp.print === "1"} />
+      <AutoPrint enabled={sp.print === "1"} documentTitle={patientName} />
 
       <div className="flex flex-col gap-2 print:hidden">
         <Link
@@ -66,11 +66,11 @@ export default async function ReportDetailPage({
             title="Protocole opératoire"
             description={`${patientName} — ${operationTypeLabels[report.operationType]}`}
           />
-          <PrintButton />
+          <PrintButton documentTitle={patientName} />
         </div>
       </div>
 
-      <div className="report-doc mx-auto w-full max-w-4xl bg-background text-sm text-foreground print:max-w-none print:text-[0.72rem]">
+      <div className="report-doc mx-auto w-full max-w-4xl bg-background text-sm text-foreground print:max-w-none print:px-8 print:py-8 print:text-[0.72rem]">
         {/* 1. Hospital header / En-tête */}
         <header className="border-b-2 border-slate-900 pb-2 text-center">
           <div className="text-sm font-bold uppercase leading-snug sm:text-base">
@@ -157,17 +157,7 @@ export default async function ReportDetailPage({
         </section>
 
         {/* 4. Footer / sign-off */}
-        <footer className="mt-6 flex items-end justify-between print:mt-4">
-          <div>
-            <p className="text-xs font-semibold uppercase text-muted-foreground">
-              Secrétariat médical
-            </p>
-            <div className="mt-1 h-14 w-44 rounded border border-dashed border-slate-400 print:h-12 print:w-36">
-              <div className="flex h-full items-center justify-center px-2 text-center text-[0.68rem] text-muted-foreground">
-                Signature / Cachet
-              </div>
-            </div>
-          </div>
+        <footer className="mt-6 print:mt-4">
           <p className="text-[0.68rem] text-muted-foreground">
             Du : {dateFormatter.format(report.createdAt)}
           </p>
