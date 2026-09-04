@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Users,
   FileText,
+  Search,
   Settings,
   Info,
   type LucideIcon,
@@ -28,6 +29,11 @@ export const mainNavLinks: NavLinkDef[] = [
     href: "/rapports",
     label: "Rapports",
     icon: FileText,
+  },
+  {
+    href: "/recherche",
+    label: "Recherche",
+    icon: Search,
   },
 ];
 

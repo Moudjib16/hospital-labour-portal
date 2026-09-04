@@ -26,13 +26,7 @@ function isBloodType(value: string): value is BloodType {
   return (Object.values(BloodType) as string[]).includes(value);
 }
 
-function parsePositiveInt(value: string): number | null {
-  const n = Number(value);
-  if (!Number.isInteger(n) || n < 0) {
-    return null;
-  }
-  return n;
-}
+const EARLIEST_BIRTH_DATE = new Date("1900-01-01T00:00:00.000Z");
 
 export async function createReport(
   _prevState: CreateReportState,
@@ -105,9 +99,16 @@ async function saveReportFromForm(
     };
   }
 
-  const age = parsePositiveInt(getString(formData, "age"));
-  if (age === null) {
-    return { error: "L'âge doit être un nombre entier positif." };
+  const dateOfBirthInput = getString(formData, "dateOfBirth");
+  if (!dateOfBirthInput) {
+    return { error: "Veuillez renseigner la date de naissance." };
+  }
+  const dateOfBirth = new Date(`${dateOfBirthInput}T00:00:00.000Z`);
+  if (Number.isNaN(dateOfBirth.getTime())) {
+    return { error: "La date de naissance est invalide." };
+  }
+  if (dateOfBirth < EARLIEST_BIRTH_DATE || dateOfBirth > new Date()) {
+    return { error: "La date de naissance est invalide." };
   }
 
   const deliveryDateInput = getString(formData, "deliveryDate");
@@ -117,7 +118,11 @@ async function saveReportFromForm(
   if (deliveryDate && Number.isNaN(deliveryDate.getTime())) {
     return { error: "La date d'accouchement est invalide." };
   }
+  if (deliveryDate && deliveryDate < dateOfBirth) {
+    return { error: "La date d'accouchement est antérieure à la date de naissance." };
+  }
 
+  const assistantFullName = getString(formData, "assistantFullName") || null;
   const birthPlace = getString(formData, "birthPlace") || null;
   const medicalHistory = getString(formData, "medicalHistory") || null;
 
@@ -125,7 +130,7 @@ async function saveReportFromForm(
     where: {
       firstName,
       lastName,
-      age,
+      dateOfBirth,
       nationality,
       bloodType,
     },
@@ -137,7 +142,7 @@ async function saveReportFromForm(
     create: {
       firstName,
       lastName,
-      age,
+      dateOfBirth,
       nationality,
       bloodType,
       birthPlace,
@@ -151,13 +156,14 @@ async function saveReportFromForm(
       doctorId: doctor.id,
       firstName,
       lastName,
-      age,
+      dateOfBirth,
       nationality,
       bloodType,
       operationType,
       deliveryDate,
       operatorFullName: doctor.name,
       anesthesiologistFullName,
+      assistantFullName,
       complications: getString(formData, "complications") || null,
       fullDescription,
       postOpNotes: getString(formData, "postOpNotes") || null,

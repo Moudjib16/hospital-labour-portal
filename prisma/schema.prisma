@@ -59,7 +59,7 @@ model Patient {
   id            String         @id @default(cuid())
   firstName     String
   lastName      String
-  age           Int
+  dateOfBirth   DateTime
   nationality   String
   bloodType     BloodType
   birthPlace    String?
@@ -76,13 +76,14 @@ model LabourReport {
   doctorId                 String
   firstName                String
   lastName                 String
-  age                      Int
+  dateOfBirth              DateTime
   nationality              String
   bloodType                BloodType
   operationType            OperationType
   deliveryDate             DateTime      @default(now())
   operatorFullName         String
   anesthesiologistFullName String
+  assistantFullName        String?
   complications            String?
   fullDescription          String        @db.Text
   postOpNotes              String?

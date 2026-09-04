@@ -17,6 +17,13 @@ const OPERATORS = [
   "Pr. Djamel Mesbah",
 ];
 
+const ASSISTANTS = [
+  "Dr. Omar Guerchi",
+  "Dr. Siham Zerkoune",
+  "Dr. Hakim Meliani",
+  "Dr. Ines Boukhalfa",
+];
+
 const BLOOD_TYPES = ["O_POS", "O_NEG", "A_POS", "A_NEG", "B_POS", "B_NEG", "AB_POS", "AB_NEG"] as const;
 const OPERATION_TYPES = ["CESARIAN", "OPERATION_PROGRAMME"] as const;
 
@@ -38,6 +45,13 @@ const BIRTHPLACES = ["Mila", "Tadjenanet", "Guerouaou", "Sidi Merouane", "Gravia
 
 function randomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randomDateOfBirth(minYear = 1980, maxYear = 2007): Date {
+  const year = randomInt(minYear, maxYear);
+  const month = randomInt(0, 11);
+  const day = randomInt(1, 28);
+  return new Date(year, month, day);
 }
 
 function pick<T>(arr: readonly T[]): T {
@@ -127,7 +141,7 @@ async function main() {
     {
       firstName: "Amina",
       lastName: "Bouzid",
-      age: 31,
+      dateOfBirth: new Date(1994, 3, 12),
       nationality: "Algérienne",
       bloodType: "O_POS" as const,
       birthPlace: "Mila",
@@ -136,7 +150,7 @@ async function main() {
     {
       firstName: "Yacine",
       lastName: "Merabet",
-      age: 36,
+      dateOfBirth: new Date(1989, 8, 23),
       nationality: "Algérienne",
       bloodType: "A_NEG" as const,
       birthPlace: "Tadjenanet",
@@ -145,7 +159,7 @@ async function main() {
     {
       firstName: "Sofia",
       lastName: "Hamidi",
-      age: 27,
+      dateOfBirth: new Date(1998, 0, 30),
       nationality: "Algérienne",
       bloodType: "AB_POS" as const,
       birthPlace: "Guerouaou",
@@ -180,7 +194,7 @@ async function main() {
       data: {
         firstName: f,
         lastName: l,
-        age: randomInt(18, 44),
+        dateOfBirth: randomDateOfBirth(),
         nationality: "Algérienne",
         bloodType: pick(BLOOD_TYPES),
         birthPlace: pick(BIRTHPLACES),
@@ -194,7 +208,7 @@ async function main() {
   // ── Labour Reports ───────────────────────────────────────
   const reportCount = await prisma.labourReport.count();
   const allPatients = await prisma.patient.findMany({
-    select: { id: true, firstName: true, lastName: true, age: true, nationality: true, bloodType: true },
+    select: { id: true, firstName: true, lastName: true, dateOfBirth: true, nationality: true, bloodType: true },
     take: TARGET_PATIENTS,
   });
   let reportsCreated = 0;
@@ -223,7 +237,7 @@ async function main() {
         doctorId: doctor.id,
         firstName: patient.firstName,
         lastName: patient.lastName,
-        age: patient.age,
+        dateOfBirth: patient.dateOfBirth,
         nationality: patient.nationality,
         bloodType: patient.bloodType,
         operationType: op,
@@ -235,6 +249,7 @@ async function main() {
           "Dr. Karim Boudraa",
           "Dr. Leila Haddad",
         ]),
+        assistantFullName: Math.random() < 0.4 ? pick(ASSISTANTS) : null,
         complications: makeComplications(),
         fullDescription: makeDescription(op),
         postOpNotes: makePostOp(),

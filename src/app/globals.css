@@ -94,6 +94,13 @@
 }
 
 @media print {
+  /* Hide browser-generated headers/footers (date, title, URL link) by
+     removing the printable margin; the report provides its own padding. */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
   body {
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;

@@ -4,7 +4,13 @@ import { useEffect, useRef } from "react";
 
 let firedForPath: string | null = null;
 
-export function AutoPrint({ enabled = false }: { enabled?: boolean }) {
+export function AutoPrint({
+  enabled = false,
+  documentTitle,
+}: {
+  enabled?: boolean;
+  documentTitle?: string;
+}) {
   const firedRef = useRef(false);
 
   useEffect(() => {
@@ -20,8 +26,11 @@ export function AutoPrint({ enabled = false }: { enabled?: boolean }) {
       window.location.pathname + window.location.search.replace(/[?&]print=1/, "").replace(/^&/, "?")
     );
 
+    const originalTitle = document.title;
+    if (documentTitle) document.title = documentTitle;
     window.print();
-  }, [enabled]);
+    document.title = originalTitle;
+  }, [enabled, documentTitle]);
 
   return null;
 }

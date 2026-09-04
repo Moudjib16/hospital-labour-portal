@@ -9,12 +9,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { bloodTypeLabels } from "@/lib/report-labels";
+import { formatBirthDate } from "@/lib/date-utils";
 
 export type PatientRow = {
   id: string;
   firstName: string;
   lastName: string;
-  age: number;
+  dateOfBirth: Date;
   nationality: string;
   bloodType: keyof typeof bloodTypeLabels;
   birthPlace: string | null;
@@ -39,7 +40,7 @@ export function PatientTable({ patients }: PatientTableProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Nom</TableHead>
-          <TableHead>Âge</TableHead>
+          <TableHead>Date de naissance</TableHead>
           <TableHead>Nationalité</TableHead>
           <TableHead>Groupe sanguin</TableHead>
           <TableHead>Lieu de naissance</TableHead>
@@ -60,7 +61,7 @@ export function PatientTable({ patients }: PatientTableProps) {
                 {patient.firstName} {patient.lastName}
               </Link>
             </TableCell>
-            <TableCell>{patient.age}</TableCell>
+            <TableCell>{formatBirthDate(patient.dateOfBirth)}</TableCell>
             <TableCell>{patient.nationality}</TableCell>
             <TableCell>{bloodTypeLabels[patient.bloodType]}</TableCell>
             <TableCell>{patient.birthPlace ?? "—"}</TableCell>
