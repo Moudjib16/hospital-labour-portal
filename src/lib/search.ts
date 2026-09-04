@@ -26,17 +26,27 @@ function emptyResponse(): ReportSearchResponse {
   return { results: [], total: 0, totalPages: 1 };
 }
 
-// Static SQL fragment (safe to inline — no user input)
+// Static SQL fragment (safe to inline — no user input).
+// NOTE: assistantFullName will be appended here in Part C once the
+// column is added to the database schema.
 const SEARCHABLE_TEXT = `
   COALESCE(r."fullDescription", '') || ' ' ||
   COALESCE(r."complications", '') || ' ' ||
-  COALESCE(r."postOpNotes", '')
+  COALESCE(r."postOpNotes", '') || ' ' ||
+  COALESCE(r."firstName", '') || ' ' ||
+  COALESCE(r."lastName", '') || ' ' ||
+  COALESCE(r."operatorFullName", '') || ' ' ||
+  COALESCE(r."anesthesiologistFullName", '')
 `;
 
 const HEADLINE_TEXT = `
   COALESCE(r."fullDescription", '') || ' ' ||
   COALESCE(r."complications", '') || ' ' ||
-  COALESCE(r."postOpNotes", '')
+  COALESCE(r."postOpNotes", '') || ' ' ||
+  COALESCE(r."firstName", '') || ' ' ||
+  COALESCE(r."lastName", '') || ' ' ||
+  COALESCE(r."operatorFullName", '') || ' ' ||
+  COALESCE(r."anesthesiologistFullName", '')
 `;
 
 function cleanTerms(query: string): string[] {

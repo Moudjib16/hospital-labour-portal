@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 
 import { db } from "@/lib/db";
 import { buttonVariants } from "@/components/ui/button";
@@ -107,13 +107,22 @@ export default async function RapportsPage({
         title="Rapports"
         description="Rapports médicaux post-opératoires et post-accouchement."
         action={
-          <Link
-            href="/rapports/nouveau"
-            className={buttonVariants({ variant: "default" })}
-          >
-            <Plus aria-hidden="true" />
-            Nouveau rapport
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/recherche?${q ? `q=${encodeURIComponent(q)}` : ""}`}
+              className={buttonVariants({ variant: "outline" })}
+            >
+              <Search aria-hidden="true" />
+              Recherche avancée
+            </Link>
+            <Link
+              href="/rapports/nouveau"
+              className={buttonVariants({ variant: "default" })}
+            >
+              <Plus aria-hidden="true" />
+              Nouveau rapport
+            </Link>
+          </div>
         }
       />
 
