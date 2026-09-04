@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Info } from "lucide-react";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
@@ -62,22 +60,6 @@ export default async function ParametresPage() {
           />
         </CardContent>
       </Card>
-
-      <Link href="/parametres/about" className="group">
-        <Card className="transition-colors hover:border-primary/50">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Info className="h-5 w-5 text-muted-foreground group-hover:text-primary" aria-hidden="true" />
-              <div>
-                <CardTitle className="text-base">À propos</CardTitle>
-                <CardDescription>
-                  Informations sur l&apos;application et son développement.
-                </CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-        </Card>
-      </Link>
     </div>
   );
 }

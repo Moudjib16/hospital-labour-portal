@@ -3,6 +3,7 @@ import {
   Users,
   FileText,
   Settings,
+  Info,
   type LucideIcon,
 } from "lucide-react";
 
@@ -35,5 +36,10 @@ export const footerNavLinks: NavLinkDef[] = [
     href: "/parametres",
     label: "Paramètres",
     icon: Settings,
+  },
+  {
+    href: "/a-propos",
+    label: "À propos",
+    icon: Info,
   },
 ];
