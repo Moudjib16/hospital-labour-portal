@@ -159,6 +159,7 @@ export default async function RapportsPage({
                   <TableHead>Date</TableHead>
                   <TableHead>Opérateur</TableHead>
                   <TableHead>Anesthésiste</TableHead>
+                  <TableHead>Assistant</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -181,6 +182,7 @@ export default async function RapportsPage({
                     <TableCell>{formatDate(report.deliveryDate)}</TableCell>
                     <TableCell>{report.operatorFullName}</TableCell>
                     <TableCell>{report.anesthesiologistFullName}</TableCell>
+                    <TableCell>{report.assistantFullName ?? "—"}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

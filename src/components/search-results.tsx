@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FileText, User } from "lucide-react";
 
 import { operationTypeLabels } from "@/lib/report-labels";
+import { ageFrom } from "@/lib/date-utils";
 import type {
   ReportSearchResult,
   PatientSearchResult,
@@ -42,7 +43,7 @@ export function ReportResultList({
                 <FileText className="size-4 shrink-0 text-muted-foreground" />
                 {report.lastName} {report.firstName}
                 <span className="text-xs font-normal text-muted-foreground">
-                  {report.age} ans
+                  {ageFrom(report.dateOfBirth, report.deliveryDate)} ans
                 </span>
               </span>
               <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
@@ -97,7 +98,7 @@ export function PatientResultList({
                 {patient.lastName} {patient.firstName}
               </Link>
             </TableCell>
-            <TableCell>{patient.age} ans</TableCell>
+            <TableCell>{ageFrom(patient.dateOfBirth)} ans</TableCell>
             <TableCell>{patient.nationality}</TableCell>
             <TableCell>{patient.reportCount}</TableCell>
           </TableRow>

@@ -9,7 +9,7 @@ export type ReportSearchResult = {
   id: string;
   firstName: string;
   lastName: string;
-  age: number;
+  dateOfBirth: Date;
   operationType: OperationType;
   deliveryDate: Date;
   operatorFullName: string;
@@ -27,8 +27,6 @@ function emptyResponse(): ReportSearchResponse {
 }
 
 // Static SQL fragment (safe to inline — no user input).
-// NOTE: assistantFullName will be appended here in Part C once the
-// column is added to the database schema.
 const SEARCHABLE_TEXT = `
   COALESCE(r."fullDescription", '') || ' ' ||
   COALESCE(r."complications", '') || ' ' ||
@@ -36,7 +34,8 @@ const SEARCHABLE_TEXT = `
   COALESCE(r."firstName", '') || ' ' ||
   COALESCE(r."lastName", '') || ' ' ||
   COALESCE(r."operatorFullName", '') || ' ' ||
-  COALESCE(r."anesthesiologistFullName", '')
+  COALESCE(r."anesthesiologistFullName", '') || ' ' ||
+  COALESCE(r."assistantFullName", '')
 `;
 
 const HEADLINE_TEXT = `
@@ -46,7 +45,8 @@ const HEADLINE_TEXT = `
   COALESCE(r."firstName", '') || ' ' ||
   COALESCE(r."lastName", '') || ' ' ||
   COALESCE(r."operatorFullName", '') || ' ' ||
-  COALESCE(r."anesthesiologistFullName", '')
+  COALESCE(r."anesthesiologistFullName", '') || ' ' ||
+  COALESCE(r."assistantFullName", '')
 `;
 
 function cleanTerms(query: string): string[] {
@@ -69,13 +69,14 @@ export async function searchReports(
   if (terms.length === 0) return emptyResponse();
   const tsQuery = terms.join(" & ");
 
-  const vectorSql = `to_tsvector('french', ${SEARCHABLE_TEXT})`;
-  const headlineSql = `ts_headline('french', ${HEADLINE_TEXT}, plainto_tsquery('french', $1), 'StartSel=<mark>, StopSel=</mark>, MaxWords=25, MinWords=12, ShortWord=3')`;
+  const vectorSql = `to_tsvector('french', unaccent(${SEARCHABLE_TEXT}))`;
+  const tsQuerySql = `plainto_tsquery('french', unaccent($1))`;
+  const headlineSql = `ts_headline('french', unaccent(${HEADLINE_TEXT}), ${tsQuerySql}, 'StartSel=<mark>, StopSel=</mark>, MaxWords=25, MinWords=12, ShortWord=3')`;
 
   const countRows = (await db.$queryRawUnsafe(
     `SELECT COUNT(*)::int AS total
      FROM "LabourReport" r
-     WHERE ${vectorSql} @@ plainto_tsquery('french', $1)`,
+     WHERE ${vectorSql} @@ ${tsQuerySql}`,
     tsQuery
   )) as { total: number }[];
 
@@ -89,14 +90,14 @@ export async function searchReports(
        r."id",
        r."firstName",
        r."lastName",
-       r."age",
+       r."dateOfBirth",
        r."operationType",
        r."deliveryDate",
        r."operatorFullName",
-       ts_rank_cd(${vectorSql}, plainto_tsquery('french', $1)) AS rank,
+       ts_rank_cd(${vectorSql}, ${tsQuerySql}) AS rank,
        ${headlineSql} AS snippet
      FROM "LabourReport" r
-     WHERE ${vectorSql} @@ plainto_tsquery('french', $1)
+     WHERE ${vectorSql} @@ ${tsQuerySql}
      ORDER BY rank DESC, r."createdAt" DESC
      LIMIT $2 OFFSET $3`,
     tsQuery,
@@ -108,7 +109,7 @@ export async function searchReports(
     id: String(row.id),
     firstName: String(row.firstName ?? ""),
     lastName: String(row.lastName ?? ""),
-    age: Number(row.age),
+    dateOfBirth: new Date(row.dateOfBirth as string | Date),
     operationType: row.operationType as OperationType,
     deliveryDate: new Date(row.deliveryDate as string | Date),
     operatorFullName: String(row.operatorFullName ?? ""),
@@ -122,7 +123,7 @@ export type PatientSearchResult = {
   id: string;
   firstName: string;
   lastName: string;
-  age: number;
+  dateOfBirth: Date;
   nationality: string;
   reportCount: number;
 };
@@ -170,7 +171,7 @@ export async function searchPatients(
     id: p.id,
     firstName: p.firstName,
     lastName: p.lastName,
-    age: p.age,
+    dateOfBirth: p.dateOfBirth,
     nationality: p.nationality,
     reportCount: p._count.reports,
   }));

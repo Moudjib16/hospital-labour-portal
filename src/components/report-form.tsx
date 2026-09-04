@@ -38,7 +38,7 @@ type ReportFormProps = {
 type ReportDraft = {
   firstName: string;
   lastName: string;
-  age: string;
+  dateOfBirth: string;
   nationality: string;
   bloodType: string;
   birthPlace: string;
@@ -46,6 +46,7 @@ type ReportDraft = {
   operationType: string;
   deliveryDate: string;
   anesthesiologistFullName: string;
+  assistantFullName: string;
   fullDescription: string;
   complications: string;
   postOpNotes: string;
@@ -54,7 +55,7 @@ type ReportDraft = {
 const initialDraft: ReportDraft = {
   firstName: "",
   lastName: "",
-  age: "",
+  dateOfBirth: "",
   nationality: "",
   bloodType: "",
   birthPlace: "",
@@ -62,6 +63,7 @@ const initialDraft: ReportDraft = {
   operationType: "",
   deliveryDate: "",
   anesthesiologistFullName: "",
+  assistantFullName: "",
   fullDescription: "",
   complications: "",
   postOpNotes: "",
@@ -159,16 +161,13 @@ export function ReportForm({ operatorName }: ReportFormProps) {
               </div>
               <div className="grid gap-5 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="age">Âge *</Label>
+                  <Label htmlFor="dateOfBirth">Date de naissance *</Label>
                   <Input
-                    id="age"
-                    name="age"
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    value={draft.age}
-                    onChange={set("age")}
-                    placeholder="Ex. 31"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    type="date"
+                    value={draft.dateOfBirth}
+                    onChange={set("dateOfBirth")}
                     required
                   />
                 </div>
@@ -280,6 +279,17 @@ export function ReportForm({ operatorName }: ReportFormProps) {
                   onChange={set("anesthesiologistFullName")}
                   placeholder="Nom de l'anesthésiste"
                   required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="assistantFullName">Assistant</Label>
+                <Input
+                  id="assistantFullName"
+                  name="assistantFullName"
+                  value={draft.assistantFullName}
+                  onChange={set("assistantFullName")}
+                  placeholder="Nom de l'assistant (facultatif)"
                 />
               </div>
 

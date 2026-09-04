@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, FileText } from "lucide-react";
 
 import { db } from "@/lib/db";
+import { ageFrom, formatBirthDate } from "@/lib/date-utils";
 import {
   bloodTypeLabels,
   operationTypeLabels,
@@ -133,7 +134,11 @@ export default async function PatientDetailPage({
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <InfoRow label="Nom" value={`${patient.firstName} ${patient.lastName}`} />
-              <InfoRow label="Âge" value={String(patient.age)} />
+              <InfoRow label="Âge" value={`${ageFrom(patient.dateOfBirth)} ans`} />
+              <InfoRow
+                label="Date de naissance"
+                value={formatBirthDate(patient.dateOfBirth)}
+              />
               <InfoRow label="Nationalité" value={patient.nationality} />
               <InfoRow
                 label="Groupe sanguin"

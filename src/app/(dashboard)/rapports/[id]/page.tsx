@@ -8,6 +8,7 @@ import {
   bloodTypeLabels,
   operationTypeLabels,
 } from "@/lib/report-labels";
+import { ageFrom } from "@/lib/date-utils";
 import { AutoPrint } from "@/components/auto-print";
 import { PrintButton } from "@/components/print-button";
 import { PageHeader } from "@/components/page-header";
@@ -92,7 +93,7 @@ export default async function ReportDetailPage({
             <dl className="mt-3 space-y-2.5 print:mt-2 print:space-y-1.5">
               <Field label="Nom" value={report.lastName} />
               <Field label="Prénom" value={report.firstName} />
-              <Field label="Âge" value={`${report.age} ans`} />
+              <Field label="Âge" value={`${ageFrom(report.dateOfBirth, report.deliveryDate)} ans`} />
               <Field label="Nationalité" value={report.nationality} />
               <Field
                 label="Groupe sanguin"
@@ -109,6 +110,9 @@ export default async function ReportDetailPage({
                 label="Anesthésiste"
                 value={report.anesthesiologistFullName}
               />
+              {report.assistantFullName ? (
+                <Field label="Assistant" value={report.assistantFullName} />
+              ) : null}
               <Field
                 label="Intervention"
                 value={operationTypeLabels[report.operationType]}
