@@ -135,23 +135,23 @@ export function ReportForm({ operatorName }: ReportFormProps) {
               </legend>
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Nom *</Label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    value={draft.firstName}
-                    onChange={set("firstName")}
-                    placeholder="Nom de famille"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Prénom *</Label>
+                  <Label htmlFor="lastName">Nom *</Label>
                   <Input
                     id="lastName"
                     name="lastName"
                     value={draft.lastName}
                     onChange={set("lastName")}
+                    placeholder="Nom de famille"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Prénom *</Label>
+                  <Input
+                    id="firstName"
+                    name="firstName"
+                    value={draft.firstName}
+                    onChange={set("firstName")}
                     placeholder="Prénom"
                     required
                   />
