@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { parseDateOnly } from "@/lib/date-utils";
 import { BloodType, OperationType } from "@/generated/prisma/enums";
 
 export type CreateReportState = {
@@ -103,7 +104,7 @@ async function saveReportFromForm(
   if (!dateOfBirthInput) {
     return { error: "Veuillez renseigner la date de naissance." };
   }
-  const dateOfBirth = new Date(`${dateOfBirthInput}T00:00:00.000Z`);
+  const dateOfBirth = parseDateOnly(dateOfBirthInput);
   if (Number.isNaN(dateOfBirth.getTime())) {
     return { error: "La date de naissance est invalide." };
   }
