@@ -400,19 +400,16 @@ function countCesariansInRange(
   ).length;
 }
 
-function lastDayOfMonth(year: number, month: number): number {
-  return new Date(year, month + 1, 0).getDate();
-}
-
 function computeStats(reports: ReportMeta[]): DashboardStats {
   const now = new Date();
   const todayStart = startOfDay(now);
   const weekStart = startOfWeek(now);
   const monthStart = startOfMonth(now);
+  const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
 
   const cesariansToday = countCesariansInRange(reports, todayStart, new Date(todayStart.getTime() + 86400000));
   const cesariansWeek = countCesariansInRange(reports, weekStart, new Date(weekStart.getTime() + 7 * 86400000));
-  const cesariansMonth = countCesariansInRange(reports, monthStart, new Date(monthStart.getTime() + 31 * 86400000));
+  const cesariansMonth = countCesariansInRange(reports, monthStart, monthEnd);
 
   const prevDayStart = new Date(todayStart.getTime() - 86400000);
   const prevCesariansDay = countCesariansInRange(reports, prevDayStart, todayStart);
@@ -423,18 +420,7 @@ function computeStats(reports: ReportMeta[]): DashboardStats {
     monthStart.getMonth() - 1,
     1
   );
-  const prevCesariansMonth = countCesariansInRange(
-    reports,
-    prevMonthStart,
-    new Date(
-      monthStart.getFullYear(),
-      monthStart.getMonth(),
-      lastDayOfMonth(
-        prevMonthStart.getFullYear(),
-        prevMonthStart.getMonth()
-      ) + 1
-    )
-  );
+  const prevCesariansMonth = countCesariansInRange(reports, prevMonthStart, monthStart);
 
   const cesariansTodayDelta = cesariansToday - prevCesariansDay;
   const cesariansWeekDelta = cesariansWeek - prevCesariansWeek;
