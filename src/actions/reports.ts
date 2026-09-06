@@ -127,48 +127,67 @@ async function saveReportFromForm(
   const birthPlace = getString(formData, "birthPlace") || null;
   const medicalHistory = getString(formData, "medicalHistory") || null;
 
-  const existing = await db.patient.findFirst({
-    where: {
-      firstName,
-      lastName,
-      dateOfBirth,
-      nationality,
-      bloodType,
-    },
-  });
+  const report = await db.$transaction(async (tx) => {
+    const existing = await tx.patient.findFirst({
+      where: {
+        firstName,
+        lastName,
+        dateOfBirth,
+        nationality,
+        bloodType,
+      },
+      select: { id: true },
+    });
 
-  const patient = await db.patient.upsert({
-    where: { id: existing?.id ?? "" },
-    update: {},
-    create: {
-      firstName,
-      lastName,
-      dateOfBirth,
-      nationality,
-      bloodType,
-      birthPlace,
-      medicalHistory,
-    },
-  });
+    let patientId: string;
+    if (existing) {
+      // Reuse the matching patient and refresh it with any new contact
+      // details entered on the form (never wipe data with empty strings).
+      if (birthPlace || medicalHistory) {
+        await tx.patient.update({
+          where: { id: existing.id },
+          data: {
+            ...(birthPlace ? { birthPlace } : {}),
+            ...(medicalHistory ? { medicalHistory } : {}),
+          },
+        });
+      }
+      patientId = existing.id;
+    } else {
+      const created = await tx.patient.create({
+        data: {
+          firstName,
+          lastName,
+          dateOfBirth,
+          nationality,
+          bloodType,
+          birthPlace,
+          medicalHistory,
+        },
+        select: { id: true },
+      });
+      patientId = created.id;
+    }
 
-  const report = await db.labourReport.create({
-    data: {
-      patientId: patient.id,
-      doctorId: doctor.id,
-      firstName,
-      lastName,
-      dateOfBirth,
-      nationality,
-      bloodType,
-      operationType,
-      deliveryDate,
-      operatorFullName: doctor.name,
-      anesthesiologistFullName,
-      assistantFullName,
-      complications: getString(formData, "complications") || null,
-      fullDescription,
-      postOpNotes: getString(formData, "postOpNotes") || null,
-    },
+    return tx.labourReport.create({
+      data: {
+        patientId,
+        doctorId: doctor.id,
+        firstName,
+        lastName,
+        dateOfBirth,
+        nationality,
+        bloodType,
+        operationType,
+        deliveryDate,
+        operatorFullName: doctor.name,
+        anesthesiologistFullName,
+        assistantFullName,
+        complications: getString(formData, "complications") || null,
+        fullDescription,
+        postOpNotes: getString(formData, "postOpNotes") || null,
+      },
+    });
   });
 
   return { id: report.id };
