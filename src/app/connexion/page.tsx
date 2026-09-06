@@ -10,15 +10,31 @@ import { LoginForm } from "@/components/login-form";
 
 type AuthState = React.ReactNode | null;
 
+// Only allow same-origin relative paths as post-login destinations, to avoid
+// open-redirects through the callbackUrl query parameter or hidden form field.
+function safeCallbackUrl(value: string | undefined): string {
+  if (
+    value &&
+    value.startsWith("/") &&
+    !value.startsWith("//") &&
+    !value.startsWith("/\\")
+  ) {
+    return value;
+  }
+  return "/tableau-de-bord";
+}
+
 async function authenticate(
   prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
   "use server";
 
+  const callbackUrl = safeCallbackUrl(
+    (formData.get("callbackUrl") as string) || undefined
+  );
+
   try {
-    const callbackUrl =
-      (formData.get("callbackUrl") as string) || "/tableau-de-bord";
     await signIn("credentials", {
       username: formData.get("username"),
       password: formData.get("password"),
@@ -32,7 +48,7 @@ async function authenticate(
     throw error;
   }
 
-  redirect("/tableau-de-bord");
+  redirect(callbackUrl);
 }
 
 export default async function ConnexionPage({
@@ -41,7 +57,7 @@ export default async function ConnexionPage({
   searchParams: Promise<{ callbackUrl?: string }>;
 }) {
   const { callbackUrl } = await searchParams;
-  const targetUrl = callbackUrl || "/tableau-de-bord";
+  const targetUrl = safeCallbackUrl(callbackUrl);
 
   const session = await auth();
   if (session?.user) {

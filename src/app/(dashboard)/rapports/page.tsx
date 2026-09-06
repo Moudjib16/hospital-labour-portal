@@ -20,6 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { operationTypeLabels } from "@/lib/report-labels";
+import { dateRangeUtc } from "@/lib/date-utils";
 import { OperationType } from "@/generated/prisma/enums";
 import { Prisma } from "@/generated/prisma/client";
 import { ReportFilters, type ReportFiltersValue } from "@/components/report-filters";
@@ -72,13 +73,7 @@ export default async function RapportsPage({
   }
 
   if (from || to) {
-    where.deliveryDate = {};
-    if (from) {
-      where.deliveryDate.gte = new Date(`${from}T00:00:00`);
-    }
-    if (to) {
-      where.deliveryDate.lte = new Date(`${to}T23:59:59`);
-    }
+    where.deliveryDate = dateRangeUtc(from, to);
   }
 
   const totalReports = await db.labourReport.count({ where });
