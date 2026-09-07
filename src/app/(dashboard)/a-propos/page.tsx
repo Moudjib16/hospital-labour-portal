@@ -65,7 +65,7 @@ export default function AboutPage() {
               Supervisé par
             </span>
             <span className="text-sm font-semibold text-foreground">
-              Dakkich Youssef
+              Dekkiche Youcef
             </span>
           </div>
           <div className="flex items-center gap-2">
