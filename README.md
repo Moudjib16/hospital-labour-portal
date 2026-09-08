@@ -82,6 +82,7 @@ After running `npx prisma db seed`:
 
 | Username    | Role   | Password   |
 | ----------- | ------ | ---------- |
+| `admin`     | ADMIN  | `admin123` |
 | `b.kacem`   | DOCTOR | `admin123` |
 | `y.belhadi` | DOCTOR | `admin123` |
 
