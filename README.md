@@ -38,20 +38,39 @@ npm install
 
 ### 2. Configure environment variables
 
-Copy the example and fill in your values:
+The repo includes a `.env.example` file with all required variables. Copy it to `.env` and fill in your values:
+
+Linux / macOS:
 
 ```bash
 cp .env.example .env
 ```
 
-Required variables:
+Windows (PowerShell):
 
-| Variable       | Description                                              |
-| -------------- | -------------------------------------------------------- |
-| `DATABASE_URL` | PostgreSQL connection string (Prisma uses it directly). |
-| `AUTH_SECRET`  | Secret used by NextAuth to sign session JWTs.            |
+```powershell
+Copy-Item .env.example .env
+```
 
-Generate a secret with: `openssl rand -base64 32`
+Open `.env` and set the required variables:
+
+| Variable       | Description                                                                 |
+| -------------- | --------------------------------------------------------------------------- |
+| `DATABASE_URL` | PostgreSQL connection string (Prisma uses it directly). For Neon, paste the connection string from your database dashboard. |
+| `AUTH_SECRET`  | Long random string used by NextAuth (Auth.js v5) to sign session JWTs.      |
+
+Generate a secret with:
+
+```bash
+openssl rand -base64 32
+```
+
+Example `.env` file:
+
+```
+DATABASE_URL="postgresql://user:password@localhost:5432/dbname?schema=public"
+AUTH_SECRET="replace-with-a-random-secret"
+```
 
 ### 3. Set up the database
 
