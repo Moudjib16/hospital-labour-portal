@@ -2,7 +2,7 @@
 
 A web application for hospitals to manage **labour & delivery reports**. Built with Next.js 16 (App Router), Prisma 7 + PostgreSQL, and NextAuth (Auth.js v5).
 
-Doctors and administrators can record patient information, create detailed delivery reports (natural / emergency C-section / scheduled C-section), and print or export them as PDF — directly from the site.
+Doctors and administrators can record patient information, create detailed delivery reports (C-section / scheduled operation), and print or export them as PDF — directly from the site.
 
 ## Features
 
@@ -10,8 +10,10 @@ Doctors and administrators can record patient information, create detailed deliv
 - **Dashboard** (`/tableau-de-bord`) — overview with key statistics.
 - **Patients** (`/patients`) — patient list with clickable detail pages and report history.
 - **Labour reports** (`/rapports`) — create, view, search & filter reports by patient, doctor, and operation type.
+- **Search** (`/recherche`) — full-text search across report narratives (with highlighting) plus a patient search tab.
 - **Print / PDF** — print a report exactly as it appears, straight from the browser.
 - **Admin settings** (`/parametres`) — user management (create users, toggle active status, change roles).
+- **About** (`/a-propos`) — developer credits and project overview.
 
 ## Tech Stack
 
@@ -101,19 +103,26 @@ After running `npx prisma db seed`:
 ```
 prisma/
   schema.prisma        # Prisma schema (models, enums)
+  migrations/          # SQL migration files
   seed.ts              # Database seed script
+prisma.config.ts       # Prisma 7 config (datasource URL, seed command, migration path)
 src/
   app/
     (dashboard)/       # Authenticated app pages
       tableau-de-bord/ # Dashboard
       patients/        # Patient list + detail
       rapports/        # Reports list, detail, create
+      recherche/       # Full-text search
       parametres/      # Admin user management
+      a-propos/        # About page
     connexion/         # Login page
     api/auth/          # NextAuth route handlers
   actions/             # Server actions (reports, users)
-  components/          # UI + feature components
-  lib/                 # db client, utils, labels
+  auth.config.ts       # Edge-safe shared Auth.js config
   auth.ts              # NextAuth configuration
+  generated/prisma/    # Generated Prisma client
   proxy.ts             # Next.js 16 auth middleware
+  components/          # UI + feature components
+  lib/                 # db client, search, utils, labels
+  types/               # Session/JWT type augmentation
 ```
